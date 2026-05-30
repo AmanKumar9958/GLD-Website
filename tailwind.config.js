@@ -9,25 +9,26 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#1E3A8A',
-          light: '#2563EB',
-          dark: '#172D6E'
+          DEFAULT: '#0A1128',
+          light: '#1c2e64',
+          dark: '#030712'
         },
         red: {
           DEFAULT: '#DC2626',
           light: '#EF4444',
-          dark: '#B91C1C'
+          dark: '#991B1B'
         },
         accent: {
           green: '#10B981',
-          orange: '#F97316',
-          yellow: '#FBBF24'
+          amber: '#F59E0B',
+          gold: '#FBBF24',
+          cyan: '#06B6D4'
         }
       },
       fontFamily: {
-        sans: ['Poppins', ...fontFamily.sans],
-        heading: ['Poppins', ...fontFamily.sans],
-        body: ['Roboto', ...fontFamily.sans]
+        sans: ['Inter', ...fontFamily.sans],
+        heading: ['Outfit', ...fontFamily.sans],
+        body: ['Inter', ...fontFamily.sans]
       }
     },
   },

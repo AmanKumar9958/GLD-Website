@@ -2,10 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  font-size: 90%;
+}
+
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Inter', sans-serif;
+  @apply bg-gray-50 text-gray-900 overflow-x-hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Hide scrollbar for cleaner look in some sections if needed */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Glassmorphism utilities */
+.glass {
+  @apply bg-white/10 backdrop-blur-md border border-white/20;
+}
+.glass-dark {
+  @apply bg-primary/40 backdrop-blur-lg border border-white/10;
 }

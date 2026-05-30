@@ -47,14 +47,6 @@ const Contact: React.FC = () => {
         <div className="absolute top-8 right-12 w-64 h-64 rounded-full opacity-15 pointer-events-none"
           style={{ background: 'radial-gradient(circle, #DC2626 0%, transparent 70%)' }} />
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          <motion.span
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white/80 px-4 py-2 rounded-full text-sm font-medium"
-          >
-            Contact GLD
-          </motion.span>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -106,6 +98,21 @@ const Contact: React.FC = () => {
                     <span className="text-sm text-gray-700">{label}</span>
                   </div>
                 ))}
+              </div>
+
+              {/* Map Iframe */}
+              <div className="mt-8 rounded-2xl overflow-hidden shadow-sm border border-gray-100 h-64 bg-gray-100 relative">
+                <iframe 
+                  src="https://maps.google.com/maps?q=GLD%20Institutions%2C%20Badarpur%2C%20New%20Delhi&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                  width="100%" 
+                  height="100%" 
+                  style={{ border: 0 }} 
+                  allowFullScreen={false} 
+                  loading="lazy" 
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Google Maps Location"
+                  className="absolute inset-0"
+                ></iframe>
               </div>
             </div>
 

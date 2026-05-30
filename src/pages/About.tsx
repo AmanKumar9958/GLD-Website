@@ -47,14 +47,6 @@ const About: React.FC = () => {
         <div className="absolute top-8 left-10 w-64 h-64 rounded-full opacity-15 pointer-events-none"
           style={{ background: 'radial-gradient(circle, #DC2626 0%, transparent 70%)' }} />
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          <motion.span
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white/80 px-4 py-2 rounded-full text-sm font-medium"
-          >
-            About GLD
-          </motion.span>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

@@ -1,279 +1,272 @@
-import React, { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
-import { BookOpen, Computer, Briefcase, CheckCircle, Clock, GraduationCap, Compass } from 'lucide-react'
+import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { BookOpen, Computer, Briefcase, CheckCircle, Clock, GraduationCap, Compass, ChevronRight, Play, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
-const toId = (title: string) => title.replace(/\s+/g, '-').toLowerCase()
-
 const courseCategories = [
-  { 
-    icon: BookOpen, 
+  {
+    id: 'academics',
+    icon: BookOpen,
     title: "Academic Courses",
-    accent: 'from-primary to-primary-dark',
+    accent: 'bg-primary',
+    textColor: 'text-primary',
+    gradient: 'from-blue-600 to-indigo-900',
     description: "Strong foundation classes with disciplined guidance and regular assessments.",
-    courses: ["8th-10th All subjects", "11th & 12th PCB", "11th & 12th Arts"] 
+    courses: [
+      { name: "8th-10th All subjects", duration: "1 Year", mode: "Offline" },
+      { name: "11th & 12th PCB", duration: "1-2 Years", mode: "Offline" },
+      { name: "11th & 12th Arts", duration: "1-2 Years", mode: "Offline" }
+    ]
   },
-  { 
-    icon: Computer, 
+  {
+    id: 'technical',
+    icon: Computer,
     title: "Technical Courses",
-    accent: 'from-red-DEFAULT to-red-dark',
+    accent: 'bg-accent-cyan',
+    textColor: 'text-accent-cyan',
+    gradient: 'from-emerald-500 to-teal-800',
     description: "Future-ready skills with hands-on sessions and project based learning.",
-    courses: ["Computer", "Spoken English"] 
+    courses: [
+      { name: "Computer Applications", duration: "6 Months", mode: "Hybrid" },
+      { name: "Spoken English & Personality", duration: "3 Months", mode: "Hybrid" }
+    ]
   },
-  { 
-    icon: Briefcase, 
+  {
+    id: 'competitive',
+    icon: Briefcase,
     title: "Competitive Courses",
-    accent: 'from-primary-dark to-red-DEFAULT',
+    accent: 'bg-accent-amber',
+    textColor: 'text-accent-amber',
+    gradient: 'from-amber-500 to-red-700',
     description: "Mentorship-driven preparation for banking, SSC, railways and state services.",
-    courses: ["Banking", "SSC", "Railway", "UPSC", "State PSCs", "Delhi Police", "UP Police", "DSSSB"] 
+    courses: [
+      { name: "Banking (PO/Clerk)", duration: "6-12 Months", mode: "Offline" },
+      { name: "SSC (CGL/CHSL)", duration: "8-12 Months", mode: "Offline" },
+      { name: "Railway (NTPC/Group D)", duration: "6 Months", mode: "Offline" },
+      { name: "UPSC / State PSCs", duration: "1-2 Years", mode: "Offline" },
+      { name: "Delhi Police / UP Police", duration: "6 Months", mode: "Offline" },
+      { name: "DSSSB", duration: "6 Months", mode: "Offline" }
+    ]
   }
 ]
 
+const highlights = [
+  { icon: CheckCircle, title: 'Structured Roadmaps', desc: 'Topic-wise plans, revision loops and doubt clearance built into every batch.' },
+  { icon: Clock, title: 'Flexible Timings', desc: 'Morning, afternoon and evening options to balance school, college or work.' },
+  { icon: GraduationCap, title: 'Result Focused', desc: 'Progress tracking, mock tests and personalized feedback from mentors.' },
+  { icon: Compass, title: 'Guided Counselling', desc: 'Course and career guidance to help you choose the right path with confidence.' },
+]
+
 const Courses: React.FC = () => {
-  const defaultCategory = courseCategories[0].title
-  const [activeCategory, setActiveCategory] = useState(() => defaultCategory)
+  const [activeCategory, setActiveCategory] = useState(courseCategories[0].id)
 
-  const visibleCategories = useMemo(
-    () => courseCategories.filter(({ title }) => title === activeCategory),
-    [activeCategory]
-  )
-  const categoryTitles = courseCategories.map(({ title }) => title)
-
-  const handleKeyDown = (title: string, event: React.KeyboardEvent<HTMLButtonElement>) => {
-    const currentIndex = categoryTitles.indexOf(title)
-    if (currentIndex === -1) return
-
-    const prevIndex = (currentIndex - 1 + categoryTitles.length) % categoryTitles.length
-    const nextIndex = (currentIndex + 1) % categoryTitles.length
-
-    switch (event.key) {
-      case 'ArrowLeft':
-      case 'ArrowUp':
-        event.preventDefault()
-        setActiveCategory(categoryTitles[prevIndex])
-        break
-      case 'ArrowRight':
-      case 'ArrowDown':
-        event.preventDefault()
-        setActiveCategory(categoryTitles[nextIndex])
-        break
-      case 'Home':
-        event.preventDefault()
-        setActiveCategory(categoryTitles[0])
-        break
-      case 'End':
-        event.preventDefault()
-        setActiveCategory(categoryTitles[categoryTitles.length - 1])
-        break
-      default:
-        break
-    }
-  }
-
-  const highlights = [
-    { icon: CheckCircle, title: 'Structured Roadmaps', desc: 'Topic-wise plans, revision loops and doubt clearance built into every batch.' },
-    { icon: Clock, title: 'Flexible Timings', desc: 'Morning, afternoon and evening options to balance school, college or work.' },
-    { icon: GraduationCap, title: 'Result Focused', desc: 'Progress tracking, mock tests and personalized feedback from mentors.' },
-    { icon: Compass, title: 'Guided Counselling', desc: 'Course and career guidance to help you choose the right path with confidence.' },
-  ]
+  const activeData = courseCategories.find(c => c.id === activeCategory)!
+  const ActiveIcon = activeData.icon
 
   return (
-    <div className="flex-grow overflow-hidden">
-      {/* Hero */}
-      <section
-        className="relative py-20"
-        style={{ background: 'linear-gradient(135deg, #0f1e5c 0%, #1E3A8A 45%, #172D6E 100%)' }}
-      >
-        <div className="absolute inset-0 opacity-10 pointer-events-none"
-          style={{
-            backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)',
-            backgroundSize: '36px 36px',
-          }} />
-        <div className="absolute top-10 right-16 w-56 h-56 rounded-full opacity-15 pointer-events-none"
-          style={{ background: 'radial-gradient(circle, #DC2626 0%, transparent 70%)' }} />
+    <div className="flex-grow overflow-x-hidden bg-gray-50">
+      
+      {/* ── HERO ── */}
+      <section className="relative bg-primary-dark pt-32 pb-24 overflow-hidden">
+        <div className="absolute inset-0 opacity-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none" />
+        
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-accent-amber/10 rounded-full blur-[100px] transform translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-accent-cyan/10 rounded-full blur-[80px] transform -translate-x-1/2 translate-y-1/2" />
+
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          <div className="max-w-4xl">
-            <motion.span 
-              initial={{ opacity: 0, y: 12 }}
+          <div className="max-w-3xl">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white/80 px-4 py-2 rounded-full text-sm font-medium"
+              className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-md border border-white/10 text-accent-amber px-5 py-2 rounded-full text-sm font-bold uppercase tracking-widest mb-6"
             >
               Our Programs
-            </motion.span>
+            </motion.div>
+            
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-4xl md:text-5xl font-heading font-bold text-white mt-6 leading-tight"
+              transition={{ delay: 0.1 }}
+              className="text-5xl md:text-7xl font-heading font-black text-white leading-tight mb-6"
             >
-              Learning paths designed to turn
-              <span className="text-red-200"> ambition </span>
-              into achievement.
+              Learning paths to turn <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-amber to-red-light">ambition</span> into achievement.
             </motion.h1>
+            
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-white/80 mt-4 text-lg max-w-2xl leading-relaxed"
+              transition={{ delay: 0.2 }}
+              className="text-xl text-gray-300 max-w-2xl leading-relaxed mb-10"
             >
-              Choose from academics, technical or competitive tracks, each crafted with mentoring, assessments and hands-on learning.
+              Choose from academics, technical or competitive tracks, each crafted with expert mentoring, robust assessments and hands-on learning.
             </motion.p>
+            
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="mt-8 flex flex-wrap gap-4"
+              transition={{ delay: 0.3 }}
+              className="flex flex-wrap gap-4"
             >
               <Link 
                 to="/contact"
-                className="inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold text-white shadow-lg transition-transform duration-300 hover:scale-105"
-                style={{ background: 'linear-gradient(135deg, #DC2626, #B91C1C)' }}
+                className="inline-flex items-center gap-3 bg-white text-primary-dark px-8 py-4 rounded-full font-bold shadow-lg transition-transform hover:scale-105"
               >
-                Talk to a Mentor
-              </Link>
-              <Link 
-                to="/about"
-                className="inline-flex items-center justify-center px-6 py-3 rounded-full font-semibold text-white border border-white/30 hover:bg-white/10 transition"
-              >
-                Why GLD?
+                Book Free Counselling
+                <ArrowRight size={18} />
               </Link>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Course Categories */}
-      <section className="bg-white py-16">
+      {/* ── COURSES NAV & DETAILS ── */}
+      <section className="py-20">
         <div className="container mx-auto px-6 lg:px-12">
-          <div className="text-center mb-12">
-            <span className="inline-block text-sm font-semibold tracking-widest uppercase mb-3 px-4 py-1 rounded-full"
-              style={{ color: '#DC2626', backgroundColor: '#FEE2E2' }}>
-              Explore Streams
-            </span>
-            <h2 className="text-4xl font-heading font-bold text-primary mb-3">Courses that fit your goals</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">Every stream includes guided mentoring, practice material, mock tests and feedback loops.</p>
+          
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-heading font-black text-primary-dark mb-4">Explore Streams</h2>
+            <p className="text-lg text-gray-500 max-w-2xl mx-auto">Select a category to view detailed course offerings and syllabi.</p>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-3 mb-10" role="tablist" aria-label="Course categories">
-            {courseCategories.map(({ title }) => {
-              const isActive = title === activeCategory
-              const tabId = `tab-${toId(title)}`
-              const panelId = `panel-${toId(title)}`
-              return (
-                <motion.button
-                  key={title}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => setActiveCategory(title)}
-                  onKeyDown={(event) => handleKeyDown(title, event)}
-                  role="tab"
-                  id={tabId}
-                  aria-selected={isActive}
-                  aria-controls={panelId}
-                  tabIndex={isActive ? 0 : -1}
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all border ${
-                    isActive
-                      ? 'bg-primary text-white shadow-md border-primary-light'
-                      : 'bg-white text-primary border-gray-200 hover:border-primary/60 hover:text-primary-dark'
-                  }`}
+          <div className="grid lg:grid-cols-12 gap-12">
+            
+            {/* Sidebar Navigation */}
+            <div className="lg:col-span-4">
+              <div className="sticky top-32 flex flex-col gap-3">
+                {courseCategories.map((cat) => {
+                  const isActive = activeCategory === cat.id
+                  const Icon = cat.icon
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => setActiveCategory(cat.id)}
+                      className={`flex items-center gap-4 p-5 rounded-2xl text-left transition-all duration-300 ${
+                        isActive 
+                          ? 'bg-white shadow-xl border border-gray-100 scale-105 z-10' 
+                          : 'bg-transparent border border-transparent hover:bg-white hover:shadow-md'
+                      }`}
+                    >
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
+                        isActive ? cat.accent : 'bg-gray-100'
+                      }`}>
+                        <Icon size={24} className={isActive ? 'text-white' : 'text-gray-500'} />
+                      </div>
+                      <div>
+                        <h3 className={`font-heading font-bold text-lg ${isActive ? 'text-primary-dark' : 'text-gray-600'}`}>
+                          {cat.title}
+                        </h3>
+                        <p className="text-sm text-gray-500">{cat.courses.length} Courses</p>
+                      </div>
+                      {isActive && (
+                        <ChevronRight size={20} className="ml-auto text-gray-400" />
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="lg:col-span-8">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeCategory}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-gray-100"
                 >
-                  {title}
-                </motion.button>
-              )
-            })}
-          </div>
-
-          <div className="grid gap-8 md:grid-cols-1 max-w-4xl mx-auto">
-            {visibleCategories.map(({ icon: Icon, title, description, courses, accent }) => {
-              const panelId = `panel-${toId(title)}`
-              const tabId = `tab-${toId(title)}`
-              return (
-              <motion.div
-                key={title}
-                whileHover={{ y: -6 }}
-                role="tabpanel"
-                id={panelId}
-                aria-labelledby={tabId}
-                className="group rounded-2xl border border-gray-100 shadow-sm overflow-hidden transition-all duration-300"
-              >
-                <div className={`p-6 text-white bg-gradient-to-br ${accent}`}>
-                  <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center mb-4">
-                    <Icon size={26} />
+                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6 bg-gradient-to-br ${activeData.gradient}`}>
+                    <ActiveIcon size={32} className="text-white" />
                   </div>
-                  <h3 className="text-xl font-heading font-semibold">{title}</h3>
-                  <p className="text-white/80 mt-2 text-sm">{description}</p>
-                </div>
-                <div className="p-6 bg-white">
-                  <ul className="space-y-3">
-                    {courses.map((course) => (
-                      <li key={course} className="flex items-start gap-3 text-gray-700">
-                        <CheckCircle size={18} className="text-red-DEFAULT mt-0.5" />
-                        <span className="text-sm">{course}</span>
-                      </li>
+                  
+                  <h2 className="text-3xl md:text-4xl font-heading font-black text-primary-dark mb-4">
+                    {activeData.title}
+                  </h2>
+                  <p className="text-lg text-gray-600 mb-10 leading-relaxed">
+                    {activeData.description}
+                  </p>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {activeData.courses.map((course, idx) => (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                        key={course.name} 
+                        className="group bg-gray-50 rounded-2xl p-6 border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all"
+                      >
+                        <h4 className="font-bold text-gray-900 text-xl mb-4 group-hover:text-primary transition-colors">{course.name}</h4>
+                        <div className="flex items-center gap-4 text-sm font-medium text-gray-500">
+                          <span className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-md border border-gray-200">
+                            <Clock size={16} /> {course.duration}
+                          </span>
+                          <span className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-md border border-gray-200">
+                            <CheckCircle size={16} /> {course.mode}
+                          </span>
+                        </div>
+                      </motion.div>
                     ))}
-                  </ul>
-                </div>
-              </motion.div>
-            )})}
+                  </div>
+
+                </motion.div>
+              </AnimatePresence>
+            </div>
+            
           </div>
         </div>
       </section>
 
-      {/* Highlights */}
-      <section className="bg-gray-50 py-16">
-        <div className="container mx-auto px-6 lg:px-12">
-          <div className="text-center mb-12">
-            <span className="inline-block text-sm font-semibold tracking-widest uppercase mb-3 px-4 py-1 rounded-full"
-              style={{ color: '#1E3A8A', backgroundColor: '#DBEAFE' }}>
-              How we teach
+      {/* ── HOW WE TEACH ── */}
+      <section className="bg-primary-dark py-24 text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none" />
+        <div className="container mx-auto px-6 lg:px-12 relative z-10">
+          <div className="text-center mb-16 max-w-3xl mx-auto">
+            <span className="inline-block text-sm font-bold tracking-widest uppercase mb-3 text-accent-cyan">
+              Methodology
             </span>
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-3">Designed for outcomes</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">We mix classroom energy with modern learning tools to make every session count.</p>
+            <h2 className="text-4xl md:text-5xl font-heading font-black mb-6">Designed for Outcomes</h2>
+            <p className="text-lg text-gray-300">We mix classroom energy with modern learning tools to make every session count.</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {highlights.map(({ icon: Icon, title, desc }) => (
-              <div
-                key={title}
-                className="h-full p-6 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition"
-              >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                  style={{ background: 'linear-gradient(135deg, #DC2626, #B91C1C)' }}>
-                  <Icon size={22} className="text-white" />
+              <div key={title} className="bg-white/5 backdrop-blur-md rounded-3xl p-8 border border-white/10 hover:bg-white/10 transition-colors">
+                <div className="w-14 h-14 bg-gradient-to-br from-accent-cyan to-blue-500 rounded-2xl flex items-center justify-center mb-6">
+                  <Icon size={28} className="text-white" />
                 </div>
-                <h3 className="font-heading font-semibold text-primary mb-2">{title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{desc}</p>
+                <h3 className="font-heading font-bold text-xl mb-3">{title}</h3>
+                <p className="text-gray-400 leading-relaxed text-sm">{desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-16">
+      {/* ── CTA ── */}
+      <section className="py-24">
         <div className="container mx-auto px-6 lg:px-12">
-          <div
-            className="relative overflow-hidden rounded-3xl p-10 md:p-14 text-white shadow-xl"
-            style={{ background: 'linear-gradient(135deg, #1E3A8A 0%, #172D6E 50%, #0f1e5c 100%)' }}
-          >
-            <div className="absolute inset-0 opacity-20 pointer-events-none"
-              style={{ background: 'radial-gradient(circle, #DC2626 0%, transparent 70%)' }} />
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-              <div>
-                <h3 className="text-2xl md:text-3xl font-heading font-bold mb-2">Need guidance choosing the right course?</h3>
-                <p className="text-white/80 max-w-2xl">Speak with our counsellors to create a learning plan tailored to your timeline and goals.</p>
-              </div>
-              <div className="flex flex-wrap gap-3">
+          <div className="bg-gradient-to-r from-gray-100 to-gray-50 rounded-[3rem] p-10 md:p-16 border border-gray-200 text-center shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-accent-amber/10 rounded-full blur-[80px]" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/10 rounded-full blur-[80px]" />
+            
+            <div className="relative z-10 max-w-2xl mx-auto">
+              <h3 className="text-3xl md:text-5xl font-heading font-black text-primary-dark mb-6">Ready to start your journey?</h3>
+              <p className="text-lg text-gray-600 mb-10">
+                Speak with our counsellors to create a learning plan tailored to your timeline and goals.
+              </p>
+              <div className="flex flex-wrap justify-center gap-4">
                 <Link
                   to="/contact"
-                  className="px-6 py-3 rounded-full font-semibold text-white shadow-lg transition-transform duration-300 hover:scale-105"
-                  style={{ background: 'linear-gradient(135deg, #DC2626, #B91C1C)' }}
+                  className="px-8 py-4 rounded-full font-bold text-white bg-primary hover:bg-primary-dark shadow-lg transition-transform hover:scale-105"
                 >
                   Book a Call
                 </Link>
                 <Link
                   to="/about"
-                  className="px-6 py-3 rounded-full font-semibold text-white border border-white/30 hover:bg-white/10 transition"
+                  className="px-8 py-4 rounded-full font-bold text-primary-dark border border-gray-300 hover:bg-gray-100 transition-colors"
                 >
                   Learn about GLD
                 </Link>
@@ -282,6 +275,7 @@ const Courses: React.FC = () => {
           </div>
         </div>
       </section>
+
     </div>
   )
 }
