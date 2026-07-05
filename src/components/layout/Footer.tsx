@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { BookOpen, Youtube, Instagram, Facebook } from 'lucide-react'
+import { BookOpen, Youtube, Instagram, Facebook, Play } from 'lucide-react'
 
 const Footer: React.FC = () => {
   const quickLinks = [
@@ -30,9 +30,22 @@ const Footer: React.FC = () => {
               </div>
               <span className="font-heading text-3xl font-bold text-white tracking-tight">GLD <span className="text-red-light">Shikshalaya</span></span>
             </Link>
-            <p className="text-gray-400 text-lg leading-relaxed max-w-md">
+            <p className="text-gray-400 text-lg leading-relaxed max-w-md mb-6">
               More than just an institution, we are the emotion that beats in the hearts of thousands of Gldians. Empowering futures through quality education.
             </p>
+
+            <a 
+              href="https://play.google.com/store/apps/details?id=com.solostackdev.gldshikshalaya"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 bg-white/5 hover:bg-white/10 text-white px-5 py-2.5 rounded-xl transition-all w-fit border border-white/10 hover:border-white/20 group"
+            >
+              <Play size={20} className="fill-accent-amber text-accent-amber group-hover:scale-110 transition-transform" />
+              <div className="flex flex-col text-left">
+                <span className="text-[9px] uppercase tracking-widest text-gray-400 font-semibold mb-0.5 leading-none">Get it on</span>
+                <span className="text-sm font-bold leading-none">Google Play</span>
+              </div>
+            </a>
           </div>
 
           <div className="md:col-span-3 md:col-start-7">

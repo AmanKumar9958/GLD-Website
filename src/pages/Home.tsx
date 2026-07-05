@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { ArrowRight, BookOpen, Computer, Briefcase, GraduationCap, Users, Award, Clock, CheckCircle, ChevronRight, Play } from 'lucide-react'
+import { ArrowRight, BookOpen, Computer, Briefcase, GraduationCap, Users, Award, Clock, CheckCircle, ChevronRight, Play, Smartphone } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import gsap from 'gsap'
@@ -386,6 +386,62 @@ const Home: React.FC = () => {
                 <p className="text-gray-500 leading-relaxed">{desc}</p>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── APP DOWNLOAD SECTION ── */}
+      <section className="bg-primary-dark py-12 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none" />
+        <div className="absolute -right-20 -top-20 w-64 h-64 bg-accent-amber/20 rounded-full blur-[80px]" />
+        <div className="absolute -left-20 -bottom-20 w-64 h-64 bg-blue-500/20 rounded-full blur-[80px]" />
+        
+        <div className="container mx-auto px-6 lg:px-12 relative z-10">
+          <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 lg:p-8 shadow-[0_0_50px_rgba(0,0,0,0.3)]">
+            <div className="flex-1 text-center md:text-left">
+              <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-3 py-1 mb-4 border border-white/10">
+                <Smartphone size={14} className="text-accent-amber" />
+                <span className="text-white text-[10px] font-bold tracking-widest uppercase">Android Exclusive</span>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-heading font-black text-white mb-3 leading-tight">
+                Learn Anywhere, Anytime
+              </h2>
+              <p className="text-gray-300 text-sm md:text-base mb-6 max-w-lg mx-auto md:mx-0 leading-relaxed font-body">
+                Take your learning journey on the go. Download the GLD Shikshalaya app exclusively from the Google Play Store for courses, mock tests, and live classes.
+              </p>
+              
+              <a 
+                href="https://play.google.com/store/apps/details?id=com.solostackdev.gldshikshalaya"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 bg-white hover:bg-gray-100 text-primary-dark px-6 py-3 rounded-full font-bold shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all hover:scale-105 group"
+              >
+                <div className="bg-primary-dark/10 p-1.5 rounded-full group-hover:bg-primary-dark/20 transition-colors">
+                  <Play size={18} className="fill-primary-dark text-primary-dark" />
+                </div>
+                <div className="flex flex-col text-left">
+                  <span className="text-[9px] uppercase tracking-widest text-gray-500 font-bold mb-0.5 leading-none">Get it on</span>
+                  <span className="text-base font-black leading-none">Google Play</span>
+                </div>
+              </a>
+            </div>
+            
+            <div className="w-full max-w-[180px] relative hidden md:block">
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="relative"
+              >
+                <div className="absolute inset-0 bg-accent-amber rounded-2xl transform rotate-6 scale-105 opacity-20 blur-md" />
+                <img 
+                  src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=400&q=80" 
+                  alt="App Mobile Interface" 
+                  className="w-full h-auto rounded-2xl shadow-xl border-2 border-white/10 transform hover:-translate-y-1 transition-transform duration-500 object-cover aspect-[9/19]"
+                />
+              </motion.div>
+            </div>
           </div>
         </div>
       </section>
