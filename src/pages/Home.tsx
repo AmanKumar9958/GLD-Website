@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import {
   ArrowRight,
   BookOpen,
@@ -8,682 +10,667 @@ import {
   Users,
   Award,
   Clock,
-  CheckCircle,
+  CheckCircle2,
   ChevronRight,
   Play,
   Smartphone,
   Star,
   Zap,
-  CheckCircle2,
   Bell,
+  Sparkles,
+  ShieldCheck,
+  TrendingUp,
+  HelpCircle,
+  FileText
 } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
+import { fetchPublishedTests } from '../services/testService'
+import { MockTest } from '../types/test'
 
 const courseCategories = [
   {
     id: 'academics',
+    index: '01',
     icon: BookOpen,
-    title: 'Academics Courses',
-    desc: 'Strong foundation for school exams with disciplined guidance.',
-    courses: ['8th-10th All subjects', '11th & 12th PCB', '11th & 12th Arts'],
-    color: 'from-blue-600 to-indigo-900',
+    title: 'Academic Foundation',
+    badge: 'Classes 8th to 12th',
+    desc: 'Uncompromising conceptual grounding in School Boards, Science (PCB), and Arts with structured daily problem-solving.',
+    highlights: ['Class 8th–10th All Subjects', 'Class 11th & 12th PCB (Medical/Board)', 'Class 11th & 12th Arts Stream'],
     accent: '#2563EB',
-    img: 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=800&q=80'
-  },
-  {
-    id: 'technical',
-    icon: Computer,
-    title: 'Technical Courses',
-    desc: 'Future-ready skills with hands-on sessions.',
-    courses: ['Computer Applications', 'Spoken English & Personality'],
-    color: 'from-emerald-500 to-teal-800',
-    accent: '#10B981',
-    img: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80'
+    bgBadge: 'bg-blue-50 text-blue-800 border-blue-200'
   },
   {
     id: 'competitive',
+    index: '02',
     icon: Briefcase,
-    title: 'Competitive Exams',
-    desc: 'Mentorship-driven preparation for government jobs.',
-    courses: ['Banking', 'SSC', 'Railway', 'UPSC', 'State PSCs', 'Police', 'DSSSB'],
-    color: 'from-amber-500 to-red-700',
-    accent: '#F59E0B',
-    img: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80'
+    title: 'Competitive Exams & CBT',
+    badge: 'Job & Court Aspirants',
+    desc: 'Targeted preparation for High Court, Supreme Court, SSC, Banking, and State PSCs with authentic CBT mock series.',
+    highlights: ['Supreme Court & High Court Exams', 'SSC CGL, CHSL, MTS & GD', 'Banking, Railways & State PSCs'],
+    accent: '#D97706',
+    bgBadge: 'bg-amber-50 text-amber-900 border-amber-200'
+  },
+  {
+    id: 'technical',
+    index: '03',
+    icon: Computer,
+    title: 'Practical & Tech Skills',
+    badge: 'Career Readiness',
+    desc: 'Empowering students with hands-on digital literacy, DCA/ADCA certifications, and spoken English confidence.',
+    highlights: ['Computer Applications (DCA / ADCA)', 'Spoken English & Communication', 'Professional Personality Building'],
+    accent: '#059669',
+    bgBadge: 'bg-emerald-50 text-emerald-800 border-emerald-200'
   },
 ]
 
 const stats = [
-  { icon: Users, value: '500+', label: 'Students Enrolled' },
-  { icon: BookOpen, value: '3', label: 'Course Categories' },
-  { icon: Award, value: '10+', label: 'Years of Excellence' },
-  { icon: GraduationCap, value: '100%', label: 'Dedication & Care' },
+  { value: '500+', label: 'Students Mentored', desc: 'Across School & Competitive streams' },
+  { value: '10+', label: 'Years of Legacy', desc: 'Consistent guidance in academic excellence' },
+  { value: '100%', label: 'Real CBT Accuracy', desc: 'Identical UI to official government test portals' },
+  { value: '4.9/5', label: 'Student Rating', desc: 'Trusted by parents and exam aspirants' },
 ]
 
-const features = [
-  { icon: CheckCircle, title: 'Expert Faculty', desc: 'Learn from experienced educators who are passionate about your success.' },
-  { icon: Clock, title: 'Flexible Timings', desc: 'Batches designed to fit your schedule — morning, afternoon and evening.' },
-  { icon: Award, title: 'Proven Results', desc: 'Track record of students achieving their academic and career goals.' },
-  { icon: GraduationCap, title: 'Holistic Growth', desc: 'Beyond books — we build confidence, skills and character.' },
+const bentoFeatures = [
+  {
+    tag: '01 / METHODOLOGY',
+    title: 'Concept-First Pedagogy',
+    desc: 'We strictly reject rote memorization. Every concept is broken down from foundational first principles to advanced application.',
+    icon: Award,
+    span: 'lg:col-span-6'
+  },
+  {
+    tag: '02 / TECHNOLOGY',
+    title: 'Authentic CBT Examination Engine',
+    desc: 'Train under realistic exam pressure. Real-time countdown timer, negative marking calculation, sectional switching, and comprehensive solution keys.',
+    icon: Zap,
+    span: 'lg:col-span-6'
+  },
+  {
+    tag: '03 / MENTORSHIP',
+    title: 'Small Batches & Individual Care',
+    desc: 'Limited batch capacity ensures our educators know every student by name, monitoring individual weak areas and pace.',
+    icon: Users,
+    span: 'lg:col-span-4'
+  },
+  {
+    tag: '04 / RESOURCES',
+    title: 'Curated Study Modules',
+    desc: 'Concise, high-yield study material, formula sheets, previous year solved papers, and regular weekend revision modules.',
+    icon: BookOpen,
+    span: 'lg:col-span-4'
+  },
+  {
+    tag: '05 / ACCESSIBILITY',
+    title: 'Offline Campus + Android App',
+    desc: 'Attend interactive in-person lectures at our campus or practice mock tests anywhere on our native Android mobile application.',
+    icon: Smartphone,
+    span: 'lg:col-span-4'
+  }
+]
+
+const testimonials = [
+  {
+    quote: 'The CBT mock test interface on GLD is exactly like the actual Supreme Court and SSC exams. It helped me eliminate my exam anxiety and improve my speed significantly.',
+    author: 'Priya Kumari',
+    target: 'Supreme Court JCA Aspirant',
+    rating: 5
+  },
+  {
+    quote: 'GLD teachers make complex Physics and Biology concepts so easy to understand for Class 12th. The personal attention in small batches is something you never get in giant coaching factories.',
+    author: 'Rahul Sharma',
+    target: 'Class 12th (PCB Board Topper)',
+    rating: 5
+  },
+  {
+    quote: 'Joined the Computer Applications and English Speaking course. The practical computer sessions gave me the confidence I needed for my office job interviews.',
+    author: 'Ankit Kumar',
+    target: 'DCA & Spoken English Graduate',
+    rating: 5
+  }
 ]
 
 const Home: React.FC = () => {
-  const heroRef = useRef<HTMLDivElement>(null)
-  const statsRef = useRef<HTMLDivElement>(null)
-  const coursesWrapperRef = useRef<HTMLDivElement>(null)
-  const featuresRef = useRef<HTMLDivElement>(null)
-
-  // Mouse Parallax State for Hero
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+  const [featuredTests, setFeaturedTests] = useState<MockTest[]>([])
+  const [loadingTests, setLoadingTests] = useState(true)
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!heroRef.current) return
-      const { clientX, clientY } = e
-      const { innerWidth, innerHeight } = window
-      const x = (clientX / innerWidth - 0.5) * 2 // -1 to 1
-      const y = (clientY / innerHeight - 0.5) * 2 // -1 to 1
-      setMousePos({ x, y })
-    }
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [])
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Counter animation for stats
-      document.querySelectorAll<HTMLElement>('.stat-number').forEach((el) => {
-        const target = el.getAttribute('data-target') || ''
-        const numericPart = parseFloat(target.replace(/[^0-9.]/g, ''))
-        const suffix = target.replace(/[0-9.]/g, '')
-        gsap.from(el, {
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 85%',
-          },
-          innerText: 0,
-          duration: 2,
-          ease: 'power2.out',
-          snap: { innerText: 1 },
-          onUpdate() {
-            el.innerText = Math.round(numericPart * (this.progress())) + suffix
-          },
-        })
-      })
-
-      // Sticky Scroll Animation for Courses
-      const panels = gsap.utils.toArray('.course-panel')
-      if (panels.length && coursesWrapperRef.current) {
-        gsap.to(panels, {
-          xPercent: -100 * (panels.length - 1),
-          ease: "none",
-          scrollTrigger: {
-            trigger: coursesWrapperRef.current,
-            pin: true,
-            scrub: 1,
-            snap: 1 / (panels.length - 1),
-            start: "top 10%",
-            end: () => "+=" + (coursesWrapperRef.current?.offsetWidth || 1000) * 1.5
-          }
-        })
+    async function getTests() {
+      try {
+        const tests = await fetchPublishedTests()
+        setFeaturedTests(tests.slice(0, 3))
+      } catch (err) {
+        console.error('Error fetching tests for homepage:', err)
+      } finally {
+        setLoadingTests(false)
       }
-    })
-
-    return () => ctx.revert()
+    }
+    getTests()
   }, [])
 
   return (
-    <div className="flex-grow overflow-x-hidden bg-gray-50">
+    <div className="min-h-screen bg-paper-light text-slate-900 pt-20 sm:pt-24 pb-16 md:pb-0">
+      {/* ── 1. HERO SECTION (Editorial Power & Institutional Prestige) ── */}
+      <section className="relative overflow-hidden pt-8 pb-16 sm:pt-14 sm:pb-24 border-b border-slate-200/80">
+        {/* Subtle Architectural Grid Texture */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-60 pointer-events-none" />
 
-      {/* ── HERO SECTION (PARALLAX + ANIMATIONS) ── */}
-      <section
-        ref={heroRef}
-        className="relative min-h-screen flex items-center justify-center overflow-hidden bg-primary-dark pt-20"
-      >
-        {/* Dynamic Abstract Background Elements */}
-        <motion.div 
-          animate={{ x: mousePos.x * -50, y: mousePos.y * -50 }}
-          transition={{ type: 'spring', damping: 50, stiffness: 100 }}
-          className="absolute top-1/4 right-1/4 w-96 h-96 bg-accent-amber/20 rounded-full blur-[120px]" 
-        />
-        <motion.div 
-          animate={{ x: mousePos.x * 60, y: mousePos.y * 60 }}
-          transition={{ type: 'spring', damping: 50, stiffness: 100 }}
-          className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-primary-light/30 rounded-full blur-[150px]" 
-        />
-        <div className="absolute inset-0 opacity-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none" />
-
-        <div className="container mx-auto px-6 lg:px-12 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
-          {/* Text Content */}
-          <div className="text-center lg:text-left mt-10 lg:mt-0">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            {/* Top Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-5 py-2 mb-8 shadow-xl"
+              transition={{ duration: 0.4 }}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900 text-slate-100 text-xs font-semibold tracking-wider uppercase mb-6 shadow-sm"
             >
-              <span className="w-2 h-2 rounded-full bg-accent-amber animate-pulse" />
-              <span className="text-accent-amber text-sm font-semibold tracking-wider uppercase">Welcome to GLD Shikshalaya</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-accent-amber animate-pulse" />
+              <span>GLD Shikshalaya &bull; Premier Academy & CBT Testing Center</span>
             </motion.div>
 
+            {/* Editorial Headline */}
             <motion.h1
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-5xl md:text-7xl font-heading font-black text-white leading-[1.1] mb-6"
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="font-heading font-black text-4xl sm:text-6xl lg:text-7xl text-slate-950 tracking-tight leading-[1.08] mb-6"
             >
-              Empowering <br className="hidden md:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-amber to-red-light">
-                Futures
-              </span>,
-              <br />
-              Inspiring Minds
+              Where Academic Foundation Meets{' '}
+              <span className="underline decoration-accent-amber decoration-wavy decoration-from-font underline-offset-6">
+                Competitive Mastery
+              </span>
             </motion.h1>
 
+            {/* Subheading */}
             <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-lg md:text-xl text-gray-300 max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed font-body"
-            >
-              We don't just teach, we transform. Join thousands of students who have realized their true potential at GLD Shikshalaya.
-            </motion.p>
-
-            <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-              className="flex flex-wrap justify-center lg:justify-start gap-5"
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed font-normal"
+            >
+              Proven academic coaching for 8th–12th boards, high-stakes government exam CBT mock tests, and practical tech certifications built to elevate student careers.
+            </motion.p>
+
+            {/* Action Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4"
             >
               <Link
-                to="/courses"
-                className="group flex items-center gap-3 bg-white text-primary-dark px-8 py-4 rounded-full font-bold shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all hover:scale-105"
+                to="/tests"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full bg-primary-dark text-white font-bold text-sm tracking-wide shadow-premium hover:bg-primary transition-all duration-200 hover:-translate-y-0.5"
               >
-                Explore Courses
-                <span className="bg-primary-dark text-white rounded-full p-1 group-hover:translate-x-1 transition-transform">
-                  <ArrowRight size={18} />
+                <Sparkles className="w-4 h-4 text-accent-gold" />
+                <span>Explore Mock Test Series</span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/30">
+                  CBT LIVE
                 </span>
               </Link>
+
               <Link
-                to="/contact"
-                className="flex items-center gap-3 bg-transparent border border-white/30 text-white px-8 py-4 rounded-full font-bold hover:bg-white/10 transition-all hover:scale-105 backdrop-blur-sm"
+                to="/courses"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-white text-slate-800 font-bold text-sm tracking-wide border border-slate-300/80 shadow-subtle hover:bg-slate-50 hover:border-slate-400 transition-all duration-200"
               >
-                <Play size={18} className="fill-white" />
-                Watch Intro
+                <span>Browse All Courses</span>
+                <ArrowRight className="w-4 h-4 text-slate-500" />
               </Link>
             </motion.div>
           </div>
 
-          {/* Hero Graphics / Parallax Cards */}
-          <div className="hidden lg:block relative h-[600px]" style={{ perspective: '1000px' }}>
-            <motion.div 
-              animate={{ rotateX: mousePos.y * 10, rotateY: mousePos.x * 10 }}
-              transition={{ type: 'spring', damping: 20, stiffness: 50 }}
-              className="absolute inset-0"
-              style={{ transformStyle: 'preserve-3d' }}
-            >
-              {/* Main Card */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-96 glass-dark rounded-3xl p-6 shadow-2xl border border-white/20 transform translate-z-10 z-20 overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary-light/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="bg-white/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6">
-                  <Award size={32} className="text-accent-gold" />
-                </div>
-                <h3 className="font-heading font-bold text-2xl text-white mb-2">Excellence Award</h3>
-                <p className="text-gray-300 text-sm">Recognized for outstanding contribution to education.</p>
-                
-                {/* Floating Elements inside card */}
-                <div className="absolute bottom-6 right-6 bg-accent-amber text-primary-dark font-bold px-4 py-2 rounded-full text-sm shadow-lg transform -rotate-6">
-                  #1 Institute
-                </div>
+          {/* Proof Bar (BZI Swiss Minimal Grid) */}
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-14 sm:mt-20 pt-8 border-t border-slate-200/90 grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8"
+          >
+            {stats.map((stat, idx) => (
+              <div key={idx} className="flex flex-col text-center sm:text-left">
+                <span className="font-heading font-black text-2xl sm:text-4xl text-slate-900 tracking-tight">
+                  {stat.value}
+                </span>
+                <span className="text-xs sm:text-sm font-bold text-slate-800 mt-1">
+                  {stat.label}
+                </span>
+                <span className="text-[11px] sm:text-xs text-slate-500 mt-0.5 leading-snug">
+                  {stat.desc}
+                </span>
               </div>
-
-              {/* Back floating card 1 */}
-              <div className="absolute top-10 left-10 w-64 h-72 bg-gradient-to-br from-red-600 to-red-900 rounded-3xl p-6 shadow-2xl transform -rotate-12 opacity-80 backdrop-blur-md flex flex-col justify-end" style={{ transform: 'translateZ(-32px) rotate(-12deg)' }}>
-                <Users size={28} className="text-white/80 mb-2" />
-                <h4 className="font-heading font-bold text-white text-xl">500+ Students</h4>
-              </div>
-
-              {/* Back floating card 2 */}
-              <div className="absolute bottom-10 right-0 w-72 h-48 glass rounded-3xl p-6 shadow-2xl transform rotate-6 backdrop-blur-xl border border-white/30 z-30 flex items-center gap-4" style={{ transform: 'translateZ(20px) rotate(6deg)' }}>
-                <div className="w-14 h-14 bg-gradient-to-r from-accent-cyan to-blue-500 rounded-full flex items-center justify-center shrink-0 shadow-lg">
-                  <CheckCircle size={24} className="text-white" />
-                </div>
-                <div>
-                  <h4 className="font-heading font-bold text-white text-lg leading-tight">100% Success<br/>Rate Focus</h4>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Bottom wave */}
-        <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
-          <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0,50 C360,100 1080,0 1440,50 L1440,100 L0,100 Z" fill="#F9FAFB" />
-          </svg>
-        </div>
-      </section>
-
-      {/* ── STATS SECTION ── */}
-      <section ref={statsRef} className="bg-gray-50 pt-10 pb-20 relative z-10 -mt-10">
-        <div className="container mx-auto px-6 lg:px-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-8 max-w-5xl mx-auto bg-white rounded-3xl shadow-xl p-8 lg:p-12 border border-gray-100 transform -translate-y-12">
-            {stats.map(({ icon: Icon, value, label }, idx) => (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                key={label}
-                className="text-center group"
-              >
-                <div className="w-12 h-12 lg:w-16 lg:h-16 mx-auto rounded-full bg-blue-50 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:scale-110 transition-all duration-300">
-                  <Icon className="text-primary group-hover:text-white transition-colors" size={24} />
-                </div>
-                <div className="text-3xl lg:text-5xl font-heading font-black text-primary-dark mb-1 stat-number" data-target={value}>
-                  {value}
-                </div>
-                <div className="text-gray-500 text-xs lg:text-sm font-medium uppercase tracking-wider">{label}</div>
-              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* ── COURSES (STICKY SCROLL) SECTION ── */}
-      <section className="bg-white overflow-hidden py-10" ref={coursesWrapperRef}>
-        <div className="container mx-auto px-6 lg:px-12 mb-10">
-          <div className="text-center md:text-left flex flex-col md:flex-row justify-between items-end gap-6">
-            <div className="max-w-2xl">
-              <span className="inline-block text-sm font-bold tracking-widest uppercase mb-3 text-red-DEFAULT">
-                What We Offer
-              </span>
-              <h2 className="text-4xl md:text-5xl font-heading font-black text-primary-dark leading-tight">
-                Discover Our <span className="text-accent-amber">Programs</span>
+      {/* ── 2. REFORGE-STYLE CBT MOCK TEST SPOTLIGHT ── */}
+      <section className="py-16 sm:py-24 bg-white border-b border-slate-200/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+            <div>
+              <div className="badge-gold mb-3">
+                <Zap className="w-3.5 h-3.5 text-amber-600" />
+                <span>ONLINE EXAMINATION PORTAL</span>
+              </div>
+              <h2 className="font-heading font-black text-3xl sm:text-4xl text-slate-950 tracking-tight">
+                All-India CBT Mock Test Series
               </h2>
+              <p className="text-slate-600 text-sm sm:text-base mt-2 max-w-xl">
+                Experience the identical interface used in official government recruitment exams with timed question palettes, sectional cutoffs, and in-depth performance analytics.
+              </p>
             </div>
-            <p className="text-gray-500 text-lg md:text-right max-w-sm hidden md:block">
-              Scroll horizontally to explore streams designed for every ambition.
-            </p>
-          </div>
-        </div>
 
-        {/* Scroll Container */}
-        <div className="flex w-[300vw] h-[60vh] min-h-[500px]">
-          {courseCategories.map((cat, idx) => {
-            const Icon = cat.icon
-            return (
-              <div key={cat.id} className="course-panel w-screen h-full flex items-center justify-center px-6 lg:px-12">
-                <div className="w-full max-w-6xl h-[90%] rounded-3xl overflow-hidden shadow-2xl flex flex-col lg:flex-row group bg-white border border-gray-100">
-                  
-                  {/* Image Side */}
-                  <div className="lg:w-1/2 h-48 lg:h-full relative overflow-hidden">
-                    <div className="absolute inset-0 bg-primary-dark/40 z-10 group-hover:bg-transparent transition-colors duration-500" />
-                    <img 
-                      src={cat.img} 
-                      alt={cat.title} 
-                      className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                    />
-                    <div className={`absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t ${cat.color} z-10 opacity-80`} />
-                    <div className="absolute bottom-8 left-8 z-20 flex items-center gap-4">
-                      <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30">
-                        <Icon size={32} className="text-white" />
+            <Link
+              to="/tests"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-primary hover:text-accent-gold transition-colors"
+            >
+              <span>View All Available Mock Tests</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* Test Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {loadingTests ? (
+              // Loading Skeleton
+              [1, 2, 3].map((i) => (
+                <div key={i} className="academic-card p-6 animate-pulse space-y-4">
+                  <div className="h-5 bg-slate-200 rounded w-1/3" />
+                  <div className="h-6 bg-slate-200 rounded w-3/4" />
+                  <div className="h-4 bg-slate-100 rounded w-full" />
+                  <div className="h-10 bg-slate-200 rounded-xl" />
+                </div>
+              ))
+            ) : featuredTests.length > 0 ? (
+              featuredTests.map((test) => (
+                <div
+                  key={test.id}
+                  className="academic-card p-6 sm:p-7 flex flex-col justify-between group hover:border-slate-300"
+                >
+                  <div>
+                    {/* Header: Category & Difficulty */}
+                    <div className="flex items-center justify-between gap-2 mb-4">
+                      <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-100 text-slate-700 uppercase tracking-wider">
+                        {test.category || 'General'}
+                      </span>
+                      <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        {test.is_free ? 'Free Mock' : `₹${test.price}`}
+                      </span>
+                    </div>
+
+                    {/* Test Title */}
+                    <h3 className="font-heading font-extrabold text-lg sm:text-xl text-slate-900 group-hover:text-primary transition-colors leading-snug mb-2">
+                      {test.title}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-xs sm:text-sm text-slate-500 line-clamp-2 leading-relaxed mb-6">
+                      {test.description || 'Full-length computer based examination simulating the actual exam syllabus and time limit.'}
+                    </p>
+
+                    {/* Meta Row */}
+                    <div className="grid grid-cols-3 gap-2 py-3 px-3.5 bg-slate-50 rounded-xl border border-slate-100 mb-6 text-center">
+                      <div>
+                        <span className="block text-[10px] text-slate-400 font-medium uppercase">Time</span>
+                        <span className="text-xs font-bold text-slate-800">{test.duration_minutes} Mins</span>
                       </div>
-                      <h3 className="text-3xl lg:text-4xl font-heading font-black text-white">{cat.title}</h3>
+                      <div>
+                        <span className="block text-[10px] text-slate-400 font-medium uppercase">Marks</span>
+                        <span className="text-xs font-bold text-slate-800">{test.total_marks}</span>
+                      </div>
+                      <div>
+                        <span className="block text-[10px] text-slate-400 font-medium uppercase">Negative</span>
+                        <span className="text-xs font-bold text-slate-800">{test.negative_marks > 0 ? `-${test.negative_marks}` : 'None'}</span>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Content Side */}
-                  <div className="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center bg-gray-50 relative">
-                    {/* Giant Watermark */}
-                    <div className="absolute top-4 right-4 text-[10rem] font-heading font-black text-gray-200/50 leading-none select-none pointer-events-none">
-                      0{idx + 1}
+                  {/* Action Button */}
+                  <Link
+                    to={`/tests/${test.id}`}
+                    className="w-full py-3 rounded-xl bg-slate-900 text-white hover:bg-primary font-bold text-xs tracking-wider uppercase text-center transition-all duration-200 shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md"
+                  >
+                    <span>Attempt Mock Test</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-accent-gold" />
+                  </Link>
+                </div>
+              ))
+            ) : (
+              // Fallback Default Mock Cards if no DB tests yet
+              [
+                { title: 'Supreme Court JCA Mock Test #01', cat: 'Court Exams', time: '120 Mins', marks: '100' },
+                { title: 'SSC CGL Tier-1 Full Length Mock', cat: 'SSC', time: '60 Mins', marks: '200' },
+                { title: 'Patna High Court Clerk Practice Test', cat: 'High Court', time: '90 Mins', marks: '100' },
+              ].map((item, idx) => (
+                <div key={idx} className="academic-card p-6 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-100 text-slate-700">
+                        {item.cat}
+                      </span>
+                      <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                        Full Syllabus
+                      </span>
                     </div>
-                    
-                    <p className="text-xl text-gray-600 mb-8 relative z-10">
+                    <h3 className="font-heading font-extrabold text-lg text-slate-900 mb-2">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-slate-500 mb-4">
+                      Comprehensive test series with detailed bilingual solutions, rank analysis, and accuracy tracking.
+                    </p>
+                  </div>
+                  <Link
+                    to="/tests"
+                    className="w-full py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs text-center uppercase"
+                  >
+                    Start Free Mock
+                  </Link>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 3. MAVEN-STYLE COURSE PATHWAYS (The 3 Educational Pillars) ── */}
+      <section className="py-16 sm:py-24 bg-paper-light border-b border-slate-200/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mb-12">
+            <div className="badge-navy mb-3">
+              <BookOpen className="w-3.5 h-3.5 text-accent-amber" />
+              <span>STRUCTURED ACADEMIC STREAMS</span>
+            </div>
+            <h2 className="font-heading font-black text-3xl sm:text-4xl text-slate-950 tracking-tight">
+              Educational Programs Tailored for Ambition
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base mt-2">
+              From school foundation batches to competitive exam accelerators and digital computer skills, our programs provide rigorous curriculum coverage with verified offline mentoring.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {courseCategories.map((cat) => {
+              const Icon = cat.icon
+              return (
+                <div
+                  key={cat.id}
+                  className="academic-card p-7 sm:p-8 flex flex-col justify-between relative overflow-hidden"
+                >
+                  {/* Subtle Number Watermark */}
+                  <div className="absolute top-4 right-6 font-heading font-black text-6xl text-slate-100 select-none pointer-events-none">
+                    {cat.index}
+                  </div>
+
+                  <div>
+                    {/* Category Icon & Pill */}
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center shadow-sm">
+                        <Icon size={24} className="text-accent-gold" />
+                      </div>
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${cat.bgBadge}`}>
+                        {cat.badge}
+                      </span>
+                    </div>
+
+                    <h3 className="font-heading font-extrabold text-2xl text-slate-900 mb-3">
+                      {cat.title}
+                    </h3>
+                    <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6">
                       {cat.desc}
                     </p>
-                    
-                    <div className="space-y-4 mb-10 relative z-10">
-                      {cat.courses.map((course) => (
-                        <div key={course} className="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                          <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: `${cat.accent}20` }}>
-                            <ChevronRight size={20} style={{ color: cat.accent }} />
-                          </div>
-                          <span className="font-semibold text-gray-800">{course}</span>
+
+                    {/* Highlights List */}
+                    <div className="space-y-2.5 mb-8">
+                      {cat.highlights.map((item) => (
+                        <div key={item} className="flex items-center gap-2.5 text-xs sm:text-sm font-semibold text-slate-800">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                          <span>{item}</span>
                         </div>
                       ))}
                     </div>
-
-                    <Link
-                      to="/courses"
-                      className="inline-flex w-max items-center gap-2 px-8 py-4 rounded-full font-bold text-white shadow-lg transition-transform hover:scale-105"
-                      style={{ backgroundColor: cat.accent }}
-                    >
-                      View All Details
-                    </Link>
                   </div>
+
+                  {/* Card Bottom CTA */}
+                  <Link
+                    to="/courses"
+                    className="inline-flex items-center justify-between w-full pt-4 border-t border-slate-100 text-xs sm:text-sm font-bold text-slate-900 hover:text-primary transition-colors group"
+                  >
+                    <span>View Full Syllabus & Timings</span>
+                    <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  </Link>
                 </div>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
       </section>
 
-      {/* ── WHY CHOOSE GLD ── */}
-      <section className="bg-gray-50 py-24 border-t border-gray-100" ref={featuresRef}>
-        <div className="container mx-auto px-6 lg:px-12">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-block text-sm font-bold tracking-widest uppercase mb-3 text-primary">
-              The GLD Difference
+      {/* ── 4. SECTION-STYLE BENTO GRID: THE GLD PEDAGOGY DIFFERENCE ── */}
+      <section className="py-16 sm:py-24 bg-white border-b border-slate-200/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <span className="text-xs font-bold uppercase tracking-wider text-accent-gold">
+              INSTITUTIONAL RIGOR
             </span>
-            <h2 className="text-4xl md:text-5xl font-heading font-black text-primary-dark mb-6">
-              Why Students Love Us
+            <h2 className="font-heading font-black text-3xl sm:text-5xl text-slate-950 tracking-tight mt-2">
+              Why Serious Students Choose GLD
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base mt-3">
+              We combine deep subject mastery with high-technology exam tools, giving students an unshakeable competitive edge.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {bentoFeatures.map((feat, idx) => {
+              const Icon = feat.icon
+              return (
+                <div
+                  key={idx}
+                  className={`academic-card p-7 sm:p-8 flex flex-col justify-between ${feat.span} bg-slate-50/50 hover:bg-white`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-[11px] font-bold font-mono text-slate-400 tracking-wider">
+                        {feat.tag}
+                      </span>
+                      <div className="p-2.5 rounded-xl bg-white border border-slate-200/80 text-primary-dark shadow-2xs">
+                        <Icon className="w-5 h-5 text-accent-gold" />
+                      </div>
+                    </div>
+                    <h3 className="font-heading font-extrabold text-xl sm:text-2xl text-slate-900 mb-2">
+                      {feat.title}
+                    </h3>
+                  </div>
+                  <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mt-3">
+                    {feat.desc}
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 5. ANDROID APP SPOTLIGHT (Preserved & Enhanced Mockup) ── */}
+      <section className="py-16 sm:py-24 bg-slate-950 text-white relative overflow-hidden">
+        {/* Subtle Background Glow */}
+        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-blue-600/10 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-amber-500/10 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            {/* Left Content */}
+            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                <Smartphone className="w-3.5 h-3.5" />
+                <span>OFFICIAL ANDROID APP &bull; GOOGLE PLAY</span>
+              </div>
+
+              <h2 className="font-heading font-black text-3xl sm:text-5xl text-white tracking-tight leading-tight">
+                Practice Real CBT Tests On The Move
+              </h2>
+
+              <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-xl mx-auto lg:mx-0">
+                Download the official GLD Shikshalaya app to take full-length mock tests, review sectional question solutions, watch lecture recordings, and track your All-India rank anytime.
+              </p>
+
+              {/* 4 Feature Points */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2 text-left">
+                <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10">
+                  <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <Zap className="w-3.5 h-3.5 text-accent-gold" />
+                    <span>Real-Time Exam Engine</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-400 mt-1">Official timer, negative marking & question palette</p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10">
+                  <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Instant Score Breakdown</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-400 mt-1">Detailed answer key with step-by-step reasoning</p>
+                </div>
+              </div>
+
+              {/* Google Play CTA */}
+              <div className="pt-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.solostackdev.gldshikshalaya"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3.5 bg-white hover:bg-slate-100 text-slate-950 px-6 py-3 rounded-2xl font-bold transition-all shadow-lg active:scale-95"
+                >
+                  <svg className="w-6 h-6 flex-shrink-0" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M3.6 1.48L14.37 12 3.6 22.52c-.38-.34-.6-.83-.6-1.37V2.85c0-.54.22-1.03.6-1.37z" />
+                    <path fill="#FBBC04" d="M17.7 8.78L14.37 12l3.33 3.22 3.75-2.15c.67-.38.67-1.76 0-2.14l-3.75-2.15z" />
+                    <path fill="#34A853" d="M14.37 12L3.6 22.52c.45.41 1.13.46 1.69.14l12.41-7.14L14.37 12z" />
+                    <path fill="#EA4335" d="M17.7 8.78L5.29 1.64C4.73 1.32 4.05 1.37 3.6 1.78L14.37 12l3.33-3.22z" />
+                  </svg>
+                  <div className="text-left">
+                    <span className="block text-[9px] uppercase tracking-wider text-slate-500 font-bold">GET IT ON</span>
+                    <span className="text-base font-extrabold text-slate-900 leading-tight">Google Play</span>
+                  </div>
+                </a>
+
+                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-slate-300">
+                  <div className="flex text-amber-400">
+                    {'★★★★★'}
+                  </div>
+                  <span className="font-bold">4.9 / 5.0 Rating</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Phone Mockup */}
+            <div className="lg:col-span-5 flex justify-center">
+              <div className="w-[270px] sm:w-[290px] bg-slate-900 rounded-[44px] p-2.5 border-[5px] border-slate-700 shadow-2xl relative">
+                {/* Punch Hole */}
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 w-3.5 h-3.5 bg-black rounded-full border border-slate-700 z-30" />
+
+                <div className="rounded-[34px] overflow-hidden bg-slate-950 text-white select-none text-left p-3.5 space-y-3">
+                  <div className="pt-2 flex justify-between items-center text-[10px] text-slate-400">
+                    <span>10:30 AM</span>
+                    <span className="text-emerald-400 font-bold">5G &bull; 98%</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <div className="flex justify-between text-[10px]">
+                      <span className="text-red-400 font-bold">● LIVE CBT</span>
+                      <span className="font-mono text-amber-300">⏱ 45:12</span>
+                    </div>
+                    <p className="text-xs font-bold text-white mt-1">Supreme Court JCA Mock #01</p>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-2 text-xs">
+                    <span className="text-[10px] text-slate-400">Question 14 of 100</span>
+                    <p className="text-slate-200 text-[11px] leading-snug">
+                      Which article of the Constitution provides for the independence of the Judiciary?
+                    </p>
+                    <div className="space-y-1.5 pt-1">
+                      <div className="p-2 rounded-lg bg-slate-800/80 text-[10px] text-slate-300">Article 50</div>
+                      <div className="p-2 rounded-lg bg-emerald-950/70 border border-emerald-500/60 text-[10px] text-emerald-300 font-bold flex justify-between">
+                        <span>Article 214</span>
+                        <span>✓</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="py-2 text-center">
+                    <div className="w-20 h-1 bg-slate-700 rounded-full mx-auto" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ── 6. DESIGNLAB-STYLE AUTHENTIC TESTIMONIALS ── */}
+      <section className="py-16 sm:py-24 bg-white border-b border-slate-200/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <span className="text-xs font-bold uppercase tracking-wider text-accent-gold">
+              REAL EXPERIENCES
+            </span>
+            <h2 className="font-heading font-black text-3xl sm:text-4xl text-slate-950 tracking-tight mt-2">
+              Words From Our Achievers
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map(({ icon: Icon, title, desc }, idx) => (
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ delay: idx * 0.15 }}
-                key={title}
-                className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 group"
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {testimonials.map((t, idx) => (
+              <div
+                key={idx}
+                className="academic-card p-7 sm:p-8 flex flex-col justify-between bg-paper-light hover:bg-white"
               >
-                <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:-translate-y-2 group-hover:bg-primary transition-all duration-300">
-                  <Icon size={28} className="text-primary group-hover:text-white transition-colors" />
+                <div>
+                  <div className="flex text-amber-400 mb-4">
+                    {[...Array(t.rating)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-amber-400" />
+                    ))}
+                  </div>
+                  <p className="text-slate-700 text-xs sm:text-sm leading-relaxed italic mb-6">
+                    "{t.quote}"
+                  </p>
                 </div>
-                <h3 className="font-heading font-bold text-xl text-primary-dark mb-3">{title}</h3>
-                <p className="text-gray-500 leading-relaxed">{desc}</p>
-              </motion.div>
+
+                <div className="pt-4 border-t border-slate-200/60">
+                  <h4 className="font-heading font-bold text-sm text-slate-900">
+                    {t.author}
+                  </h4>
+                  <span className="text-[11px] font-medium text-slate-500">
+                    {t.target}
+                  </span>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── APP DOWNLOAD SECTION ── */}
-      <section className="relative py-20 lg:py-28 bg-[#030712] overflow-hidden">
-        {/* Ambient Glow Orbs */}
-        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-blue-600/20 rounded-full blur-[130px] pointer-events-none" />
-        <div className="absolute bottom-10 right-0 w-[450px] h-[450px] bg-accent-amber/15 rounded-full blur-[150px] pointer-events-none" />
-        <div className="absolute inset-0 opacity-5 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
-
-        <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          <div className="relative rounded-3xl lg:rounded-[40px] bg-gradient-to-br from-white/[0.08] via-white/[0.03] to-white/[0.01] border border-white/10 p-8 sm:p-12 lg:p-16 backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,0.6)] overflow-hidden">
-            
-            {/* Background subtle diagonal glow */}
-            <div className="absolute -top-32 -right-32 w-96 h-96 bg-primary-light/20 rounded-full blur-[100px] pointer-events-none" />
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-              
-              {/* Left Column: Value Prop, Features & CTA */}
-              <div className="lg:col-span-7 text-center lg:text-left space-y-6">
-                
-                {/* Pill Tag */}
-                <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-bold tracking-wide uppercase">
-                  <Smartphone className="w-3.5 h-3.5" />
-                  <span>Android App • Available on Google Play</span>
-                </div>
-
-                {/* Main Heading */}
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-black text-white leading-[1.15] tracking-tight">
-                  Crack Your Exams{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-amber via-yellow-300 to-amber-500">
-                    Anywhere, Anytime
-                  </span>
-                </h2>
-
-                {/* Subtitle */}
-                <p className="text-gray-300 text-sm sm:text-base leading-relaxed max-w-xl mx-auto lg:mx-0">
-                  Take your learning journey on the go. Experience real computer-based mock tests, live and recorded lectures, instant question explanations, and smart performance tracking directly on your mobile device.
-                </p>
-
-                {/* 4 Feature Points Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2 text-left">
-                  <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-white/[0.04] border border-white/5 hover:border-white/15 transition-colors">
-                    <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 flex-shrink-0">
-                      <Zap className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-white">Full CBT Exam Engine</h4>
-                      <p className="text-[11px] text-gray-400 mt-0.5">Real exam timers, negative marking & palette</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-white/[0.04] border border-white/5 hover:border-white/15 transition-colors">
-                    <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 flex-shrink-0">
-                      <CheckCircle2 className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-white">Instant Solutions & Keys</h4>
-                      <p className="text-[11px] text-gray-400 mt-0.5">Detailed step-by-step reasoning for all Qs</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-white/[0.04] border border-white/5 hover:border-white/15 transition-colors">
-                    <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 flex-shrink-0">
-                      <BookOpen className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-white">Video Classes & Notes</h4>
-                      <p className="text-[11px] text-gray-400 mt-0.5">Curated syllabus lectures & downloadable PDFs</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-white/[0.04] border border-white/5 hover:border-white/15 transition-colors">
-                    <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400 flex-shrink-0">
-                      <Bell className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-white">Live Exam Updates</h4>
-                      <p className="text-[11px] text-gray-400 mt-0.5">Timely test release & notification alerts</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Call To Action Buttons & Social Proof */}
-                <div className="pt-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5">
-                  <a
-                    href="https://play.google.com/store/apps/details?id=com.solostackdev.gldshikshalaya"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-4 bg-white hover:bg-gray-100 active:scale-95 text-gray-900 px-6 py-3.5 rounded-2xl font-bold shadow-[0_10px_30px_rgba(255,255,255,0.15)] transition-all group"
-                  >
-                    {/* Official Multi-colored Google Play Store Triangle Icon */}
-                    <svg className="w-7 h-7 flex-shrink-0" viewBox="0 0 24 24">
-                      <path fill="#4285F4" d="M3.6 1.48L14.37 12 3.6 22.52c-.38-.34-.6-.83-.6-1.37V2.85c0-.54.22-1.03.6-1.37z" />
-                      <path fill="#FBBC04" d="M17.7 8.78L14.37 12l3.33 3.22 3.75-2.15c.67-.38.67-1.76 0-2.14l-3.75-2.15z" />
-                      <path fill="#34A853" d="M14.37 12L3.6 22.52c.45.41 1.13.46 1.69.14l12.41-7.14L14.37 12z" />
-                      <path fill="#EA4335" d="M17.7 8.78L5.29 1.64C4.73 1.32 4.05 1.37 3.6 1.78L14.37 12l3.33-3.22z" />
-                    </svg>
-                    <div className="flex flex-col text-left">
-                      <span className="text-[10px] uppercase tracking-wider text-gray-500 font-bold leading-none">GET IT ON</span>
-                      <span className="text-lg font-black text-gray-900 leading-tight mt-0.5 group-hover:text-primary transition-colors">Google Play</span>
-                    </div>
-                  </a>
-
-                  {/* Rating / Social Proof */}
-                  <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white/[0.05] border border-white/10 text-left">
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-1 text-amber-400">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                        ))}
-                      </div>
-                      <span className="text-xs font-bold text-white mt-1">4.9 / 5.0 Rating</span>
-                      <span className="text-[10px] text-gray-400">10,000+ Students Enrolled</span>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Right Column: Realistic Android CBT Exam Mockup */}
-              <div className="lg:col-span-5 flex justify-center relative">
-                
-                {/* Ambient Behind-Phone Glow */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/30 to-amber-500/20 rounded-full blur-[80px] -z-10 scale-90" />
-
-                {/* Floating Glass Badge 1 (Top Left) */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="absolute -top-4 -left-4 sm:-left-8 z-20 hidden sm:flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-gray-900/90 border border-white/20 backdrop-blur-xl shadow-2xl"
-                >
-                  <div className="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
-                    ✓
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-bold text-white leading-tight">100% CBT Simulation</p>
-                    <p className="text-[9px] text-gray-400">Timer & Negative Marking</p>
-                  </div>
-                </motion.div>
-
-                {/* Floating Glass Badge 2 (Bottom Right) */}
-                <motion.div
-                  initial={{ opacity: 0, y: -20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                  className="absolute -bottom-4 -right-4 sm:-right-6 z-20 hidden sm:flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-gray-900/90 border border-white/20 backdrop-blur-xl shadow-2xl"
-                >
-                  <div className="w-7 h-7 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">
-                    ★
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-bold text-white leading-tight">Instant Analysis</p>
-                    <p className="text-[9px] text-gray-400">Sectional Marks & Solution</p>
-                  </div>
-                </motion.div>
-
-                {/* Device Frame */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95, y: 30 }}
-                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.7 }}
-                  className="w-[275px] sm:w-[300px] bg-[#0A1128] rounded-[44px] p-3 border-[6px] border-gray-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative"
-                >
-                  {/* Punch Hole Camera */}
-                  <div className="absolute top-5 left-1/2 -translate-x-1/2 w-4 h-4 bg-black rounded-full border border-gray-800 z-30" />
-
-                  {/* Inner Screen */}
-                  <div className="rounded-[34px] overflow-hidden bg-slate-900 text-white border border-white/5 select-none text-left">
-                    
-                    {/* Status Bar */}
-                    <div className="px-6 pt-3 pb-2 flex justify-between items-center text-[10px] text-gray-400 font-medium">
-                      <span>4:30 PM</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[9px] font-bold text-emerald-400">5G</span>
-                        <div className="w-4 h-2 border border-gray-400 rounded-sm p-0.5 flex items-center">
-                          <div className="w-full h-full bg-emerald-400 rounded-2xs" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* App Header Inside Phone */}
-                    <div className="px-4 py-2.5 bg-primary border-b border-white/10 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <img src="/icon.png" alt="GLD" className="w-6 h-6 rounded-full object-cover" />
-                        <span className="text-xs font-bold font-heading text-white tracking-wide">GLD Shikshalaya</span>
-                      </div>
-                      <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-amber-400">
-                        ⚡
-                      </div>
-                    </div>
-
-                    {/* App Screen Content: Active Exam Room */}
-                    <div className="p-3.5 space-y-3 bg-[#0d1630]">
-                      
-                      {/* Active Test Card */}
-                      <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-900/60 to-indigo-900/60 border border-blue-400/20">
-                        <div className="flex items-center justify-between text-[10px]">
-                          <span className="px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 font-bold tracking-wide">
-                            ● LIVE EXAM
-                          </span>
-                          <span className="font-mono font-bold text-amber-300 bg-black/40 px-2 py-0.5 rounded-md">
-                            ⏱ 58:42
-                          </span>
-                        </div>
-                        <h5 className="text-xs font-bold text-white mt-1.5 leading-snug">
-                          SSC CGL Tier-I Mock #01
-                        </h5>
-                      </div>
-
-                      {/* Section Tabs */}
-                      <div className="flex gap-1.5 overflow-x-hidden text-[10px]">
-                        <span className="px-2.5 py-1 rounded-lg bg-primary text-white font-bold whitespace-nowrap border border-white/20">
-                          Reasoning
-                        </span>
-                        <span className="px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 whitespace-nowrap">
-                          General Awareness
-                        </span>
-                        <span className="px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 whitespace-nowrap">
-                          Quant
-                        </span>
-                      </div>
-
-                      {/* Question Card */}
-                      <div className="p-3 rounded-2xl bg-white/[0.05] border border-white/10 space-y-2">
-                        <div className="flex justify-between text-[9px] text-gray-400">
-                          <span className="font-bold text-white">Q.4 of 100</span>
-                          <span className="text-emerald-400 font-semibold">+2.0 / -0.5</span>
-                        </div>
-                        <p className="text-[11px] text-gray-200 leading-snug">
-                          Select the option that is related to the third term in the same way as the second term:
-                        </p>
-                        
-                        {/* Options */}
-                        <div className="space-y-1.5 pt-1">
-                          <div className="p-2 rounded-xl bg-white/5 border border-white/5 text-[10px] text-gray-300 flex items-center gap-2">
-                            <span className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-[9px]">A</span>
-                            <span>Aptitude</span>
-                          </div>
-                          <div className="p-2 rounded-xl bg-primary/40 border border-primary text-[10px] text-white flex items-center justify-between font-semibold shadow-sm">
-                            <div className="flex items-center gap-2">
-                              <span className="w-4 h-4 rounded-full bg-primary text-white flex items-center justify-center text-[9px]">B</span>
-                              <span>General Intelligence</span>
-                            </div>
-                            <span className="text-accent-amber text-xs">✓</span>
-                          </div>
-                          <div className="p-2 rounded-xl bg-white/5 border border-white/5 text-[10px] text-gray-300 flex items-center gap-2">
-                            <span className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-[9px]">C</span>
-                            <span>Language Comprehension</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Action Bar */}
-                      <div className="flex gap-2 pt-1">
-                        <button className="flex-1 py-1.5 rounded-xl bg-white/10 text-gray-300 text-[10px] font-semibold">
-                          Review
-                        </button>
-                        <button className="flex-1 py-1.5 rounded-xl bg-primary text-white text-[10px] font-bold shadow-md">
-                          Save & Next →
-                        </button>
-                      </div>
-
-                    </div>
-
-                    {/* Bottom Navigation Home Bar */}
-                    <div className="py-2 flex justify-center bg-slate-900">
-                      <div className="w-24 h-1 bg-gray-600 rounded-full" />
-                    </div>
-
-                  </div>
-                </motion.div>
-
-              </div>
-
-            </div>
+      {/* ── 7. BZI-STYLE INSTITUTIONAL CLOSING CTA ── */}
+      <section className="py-16 sm:py-20 bg-paper-warm text-slate-900">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center space-y-6">
+          <h2 className="font-heading font-black text-3xl sm:text-5xl text-slate-950 tracking-tight">
+            Build Your Academic & Career Trajectory
+          </h2>
+          <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+            Visit our physical campus for personalized academic counseling, or register online to begin your CBT mock test practice right now.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
+            <Link
+              to="/contact"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-primary-dark text-white font-bold text-sm shadow-md hover:bg-primary transition-all"
+            >
+              Book Free Counseling / Visit Us
+            </Link>
+            <Link
+              to="/tests"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white text-slate-800 font-bold text-sm border border-slate-300 shadow-2xs hover:bg-slate-50 transition-all"
+            >
+              Start Free Mock Test
+            </Link>
           </div>
         </div>
       </section>
@@ -691,5 +678,4 @@ const Home: React.FC = () => {
   )
 }
 
-export default Home;
-
+export default Home

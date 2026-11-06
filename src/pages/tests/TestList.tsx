@@ -7,13 +7,14 @@ import {
   HelpCircle,
   Sparkles,
   Search,
-  Filter,
   CheckCircle2,
   ArrowRight,
   BookOpen,
   History,
-  Lock,
   ChevronRight,
+  TrendingUp,
+  FileCheck2,
+  ShieldCheck
 } from 'lucide-react'
 import { fetchPublishedTests, fetchStudentAttempts } from '../../services/testService'
 import { MockTest, TestAttempt } from '../../types/test'
@@ -49,13 +50,15 @@ export const TestList: React.FC = () => {
     loadData()
   }, [user])
 
-  // Categories
+  // Categories with counts
   const categories = useMemo(() => {
-    const set = new Set(['All'])
+    const map = new Map<string, number>()
+    map.set('All', tests.length)
     tests.forEach((t) => {
-      if (t.category) set.add(t.category)
+      const cat = t.category || 'General'
+      map.set(cat, (map.get(cat) || 0) + 1)
     })
-    return Array.from(set)
+    return Array.from(map.entries())
   }, [tests])
 
   // Filtered Tests
@@ -83,94 +86,83 @@ export const TestList: React.FC = () => {
 
   const handleStartTest = (test: MockTest) => {
     if (!user) {
-      openAuthModal('login')
+      openAuthModal()
       return
     }
     navigate(`/tests/${test.id}`)
   }
 
   return (
-    <div className="flex-grow overflow-x-hidden bg-gray-50 pb-20">
-      {/* HERO SECTION */}
-      <section className="relative bg-gradient-to-b from-primary-dark via-primary to-[#0f1e5c] text-white pt-36 pb-20 px-6 md:px-12 mb-10 overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
-        
-        {/* Glow accents */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent-amber/10 rounded-full blur-[100px] transform translate-x-1/3 -translate-y-1/3 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-red-DEFAULT/10 rounded-full blur-[80px] transform -translate-x-1/3 translate-y-1/3 pointer-events-none" />
-
-        <div className="max-w-6xl mx-auto relative z-10 text-center space-y-4">
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold uppercase tracking-wider text-accent-gold"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-accent-gold" />
-            <span>Real Exam Simulation • CBT Interface</span>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-3xl md:text-5xl font-heading font-extrabold tracking-tight text-white"
-          >
-            GLD All-India Mock Test Series
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-sm md:text-base text-gray-200 max-w-2xl mx-auto"
-          >
-            Practice standard computer-based tests with exact exam timers, negative marking, sectional breakdown, and detailed question-by-question solutions.
-          </motion.p>
+    <div className="min-h-screen bg-paper-light text-slate-900 pt-20 sm:pt-24 pb-20 md:pb-12">
+      {/* ── HEADER / BANNER ── */}
+      <section className="relative py-12 sm:py-16 bg-white border-b border-slate-200/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <div className="badge-gold mb-3.5">
+              <Sparkles className="w-3.5 h-3.5 text-accent-gold" />
+              <span>OFFICIAL CBT SIMULATION ENGINE</span>
+            </div>
+            <h1 className="font-heading font-black text-3xl sm:text-5xl text-slate-950 tracking-tight leading-tight">
+              All-India Mock Test Series
+            </h1>
+            <p className="text-slate-600 text-sm sm:text-base mt-3 leading-relaxed">
+              Timed computer-based examinations adhering strictly to current government recruiting patterns. Features negative marking, real-time question palette, and bilingual solution explanations.
+            </p>
+          </div>
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto px-6">
-        {/* FILTERS & SEARCH BAR */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
-          {/* Category Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 shadow-sm ${
-                  selectedCategory === cat
-                    ? 'bg-primary text-white shadow-primary/20 scale-105'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+      {/* ── CONTROLS & TEST CATALOG ── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        {/* Filter Pills & Search */}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
+          {/* Horizontal Category Scroll (Mobile Thumb-Zone) */}
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+            {categories.map(([cat, count]) => {
+              const isActive = selectedCategory === cat
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-200 ${
+                    isActive
+                      ? 'bg-primary-dark text-white shadow-sm'
+                      : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200/80'
+                  }`}
+                >
+                  <span>{cat}</span>
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                    isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  }`}>
+                    {count}
+                  </span>
+                </button>
+              )
+            })}
           </div>
 
           {/* Search Box */}
-          <div className="relative w-full md:w-72">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+          <div className="relative w-full md:w-80">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search tests by title..."
-              className="w-full pl-10 pr-4 py-2 text-xs md:text-sm bg-white border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary shadow-sm"
+              placeholder="Search tests by keyword..."
+              className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm bg-white border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary shadow-2xs"
             />
           </div>
         </div>
 
-        {/* LOADING SKELETON */}
+        {/* LOADING STATE */}
         {isLoading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((n) => (
-              <div key={n} className="bg-white rounded-2xl p-6 border border-gray-200 animate-pulse space-y-4">
-                <div className="h-4 bg-gray-200 rounded w-1/3" />
-                <div className="h-6 bg-gray-200 rounded w-3/4" />
-                <div className="h-16 bg-gray-100 rounded" />
-                <div className="h-10 bg-gray-200 rounded" />
+              <div key={n} className="academic-card p-6 animate-pulse space-y-4">
+                <div className="h-4 bg-slate-200 rounded w-1/3" />
+                <div className="h-6 bg-slate-200 rounded w-3/4" />
+                <div className="h-16 bg-slate-100 rounded-xl" />
+                <div className="h-10 bg-slate-200 rounded-xl" />
               </div>
             ))}
           </div>
@@ -178,92 +170,75 @@ export const TestList: React.FC = () => {
 
         {/* EMPTY STATE */}
         {!isLoading && filteredTests.length === 0 && (
-          <div className="text-center py-16 bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
-            <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-gray-900">No Mock Tests Found</h3>
-            <p className="text-xs text-gray-500 max-w-md mx-auto mt-1">
+          <div className="text-center py-16 bg-white rounded-2xl border border-slate-200 p-8 shadow-subtle max-w-xl mx-auto">
+            <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+            <h3 className="font-heading font-bold text-lg text-slate-900">No Tests Found</h3>
+            <p className="text-xs text-slate-500 mt-1">
               {searchQuery
-                ? `No tests match your search "${searchQuery}". Try a different keyword.`
-                : 'There are no active mock tests in this category right now. Check back soon!'}
+                ? `No tests match your search "${searchQuery}". Please try another keyword.`
+                : 'There are currently no published tests in this category. New tests are uploaded weekly!'}
             </p>
           </div>
         )}
 
-        {/* TEST CARDS GRID */}
+        {/* TEST CARDS GRID (Reforge Data-Density) */}
         {!isLoading && filteredTests.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredTests.map((test) => {
               const previousAttempt = attemptMap[test.id]
 
               return (
-                <motion.div
+                <div
                   key={test.id}
-                  whileHover={{ y: -4 }}
-                  transition={{ duration: 0.2 }}
-                  className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md flex flex-col justify-between"
+                  className="academic-card p-6 sm:p-7 flex flex-col justify-between group"
                 >
-                  <div className="p-6">
-                    {/* Top Row: Category + Free badge */}
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-50 text-primary uppercase tracking-wider border border-blue-100">
+                  <div>
+                    {/* Category & Badge */}
+                    <div className="flex items-center justify-between gap-2 mb-3.5">
+                      <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-100 text-slate-700 uppercase tracking-wider">
                         {test.category || 'General'}
                       </span>
                       {test.is_free ? (
-                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          Free Test
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                          Free Mock
                         </span>
                       ) : (
-                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-900 border border-amber-200">
                           ₹{test.price}
                         </span>
                       )}
                     </div>
 
-                    {/* Title & Description */}
-                    <h3 className="text-base font-bold text-gray-900 font-heading line-clamp-1 mb-1.5">
+                    {/* Title */}
+                    <h3 className="font-heading font-extrabold text-lg sm:text-xl text-slate-900 group-hover:text-primary transition-colors leading-snug mb-2">
                       {test.title}
                     </h3>
-                    <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed mb-4 min-h-[32px]">
-                      {test.description || 'Comprehensive exam pattern practice test with detailed analytical report and solution explanations.'}
+
+                    {/* Description */}
+                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-5 min-h-[32px]">
+                      {test.description || 'Full-length computer based examination simulating the actual exam syllabus and time limit.'}
                     </p>
 
-                    {/* Meta Specs: Duration, Marks, Questions */}
-                    <div className="grid grid-cols-3 gap-2 py-3 px-3 bg-gray-50 rounded-xl text-center border border-gray-100">
+                    {/* Metadata Grid */}
+                    <div className="grid grid-cols-3 gap-2 py-3 px-3 bg-slate-50 rounded-xl border border-slate-100 text-center mb-4">
                       <div>
-                        <div className="flex items-center justify-center gap-1 text-gray-400 text-[10px]">
-                          <Clock className="w-3 h-3 text-amber-600" />
-                          <span>Time</span>
-                        </div>
-                        <div className="font-bold text-xs text-gray-900 mt-0.5">
-                          {test.duration_minutes} Mins
-                        </div>
+                        <span className="block text-[10px] text-slate-400 font-medium uppercase">Time</span>
+                        <span className="text-xs font-bold text-slate-800">{test.duration_minutes} Mins</span>
                       </div>
-
-                      <div className="border-x border-gray-200">
-                        <div className="flex items-center justify-center gap-1 text-gray-400 text-[10px]">
-                          <Award className="w-3 h-3 text-primary" />
-                          <span>Marks</span>
-                        </div>
-                        <div className="font-bold text-xs text-gray-900 mt-0.5">
-                          {test.total_marks}
-                        </div>
+                      <div className="border-x border-slate-200">
+                        <span className="block text-[10px] text-slate-400 font-medium uppercase">Marks</span>
+                        <span className="text-xs font-bold text-slate-800">{test.total_marks}</span>
                       </div>
-
                       <div>
-                        <div className="flex items-center justify-center gap-1 text-gray-400 text-[10px]">
-                          <HelpCircle className="w-3 h-3 text-emerald-600" />
-                          <span>Questions</span>
-                        </div>
-                        <div className="font-bold text-xs text-gray-900 mt-0.5">
-                          {test.questions_count ?? 0} Qs
-                        </div>
+                        <span className="block text-[10px] text-slate-400 font-medium uppercase">Questions</span>
+                        <span className="text-xs font-bold text-slate-800">{test.questions_count ?? 'Full'}</span>
                       </div>
                     </div>
 
-                    {/* Previous Attempt Summary if any */}
+                    {/* Previous Attempt Summary if Available */}
                     {previousAttempt && (
-                      <div className="mt-3 p-2.5 rounded-lg bg-emerald-50/70 border border-emerald-200/60 flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1.5 text-emerald-800 font-medium">
+                      <div className="mb-4 p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200/60 flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-1.5 text-emerald-900 font-medium">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                           <span>Last Score:</span>
                           <span className="font-bold">{previousAttempt.score}/{test.total_marks}</span>
@@ -272,77 +247,83 @@ export const TestList: React.FC = () => {
                           to={`/tests/result/${previousAttempt.id}`}
                           className="text-[11px] font-bold text-emerald-700 hover:underline flex items-center"
                         >
-                          View Solutions <ChevronRight className="w-3 h-3" />
+                          Review <ChevronRight className="w-3 h-3" />
                         </Link>
                       </div>
                     )}
                   </div>
 
                   {/* Card Bottom CTA */}
-                  <div className="px-6 pb-6 pt-2">
-                    <button
-                      onClick={() => handleStartTest(test)}
-                      className="w-full py-2.5 px-4 rounded-xl bg-primary hover:bg-primary-light text-white font-semibold text-xs md:text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-primary/20 active:scale-95"
-                    >
-                      <span>{previousAttempt ? 'Retake Test' : 'Start Test Now'}</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </motion.div>
+                  <button
+                    onClick={() => handleStartTest(test)}
+                    className="w-full py-3 px-4 rounded-xl bg-primary-dark hover:bg-primary text-white font-bold text-xs tracking-wider uppercase transition-all duration-200 flex items-center justify-center gap-2 shadow-2xs hover:shadow-md active:scale-98"
+                  >
+                    <span>{previousAttempt ? 'Retake Examination' : 'Start Mock Test'}</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-accent-gold" />
+                  </button>
+                </div>
               )
             })}
           </div>
         )}
 
-        {/* RECENT ATTEMPTS SECTION (IF LOGGED IN) */}
+        {/* RECENT ATTEMPTS TABLE (If user logged in & has attempts) */}
         {user && attempts.length > 0 && (
-          <div className="mt-16 bg-white rounded-2xl border border-gray-200 p-6 md:p-8 shadow-sm">
-            <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
-              <div className="flex items-center gap-2">
-                <History className="w-5 h-5 text-primary" />
-                <h3 className="text-lg font-bold font-heading text-gray-900">Your Recent Test Results</h3>
+          <div className="mt-16 bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-subtle">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-lg bg-amber-50 text-accent-gold">
+                  <History className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-extrabold text-lg text-slate-900">
+                    Your Examination History
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    {attempts.length} Attempt(s) recorded in your student account
+                  </p>
+                </div>
               </div>
-              <span className="text-xs text-gray-500 font-medium">{attempts.length} Attempt(s) recorded</span>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="bg-gray-50 text-gray-500 font-semibold border-b border-gray-200">
-                    <th className="py-3 px-4">Test Name</th>
+                  <tr className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                    <th className="py-3 px-4">Test Title</th>
                     <th className="py-3 px-4">Score</th>
                     <th className="py-3 px-4">Correct / Incorrect</th>
                     <th className="py-3 px-4">Accuracy</th>
                     <th className="py-3 px-4">Date</th>
-                    <th className="py-3 px-4 text-right">Action</th>
+                    <th className="py-3 px-4 text-right">Solutions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {attempts.slice(0, 5).map((att) => (
-                    <tr key={att.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="py-3 px-4 font-semibold text-gray-900 max-w-xs truncate">
+                <tbody className="divide-y divide-slate-100">
+                  {attempts.slice(0, 10).map((att) => (
+                    <tr key={att.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="py-3.5 px-4 font-bold text-slate-900 max-w-xs truncate">
                         {tests.find((t) => t.id === att.test_id)?.title || 'Mock Test'}
                       </td>
-                      <td className="py-3 px-4 font-bold text-primary">
-                        {att.score} <span className="text-gray-400 font-normal">/{att.total_marks}</span>
+                      <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
+                        {att.score} <span className="text-slate-400 font-normal">/{att.total_marks}</span>
                       </td>
-                      <td className="py-3 px-4 text-gray-700">
-                        <span className="text-emerald-600 font-bold">+{att.correct_count}</span>
+                      <td className="py-3.5 px-4 text-slate-700">
+                        <span className="text-emerald-700 font-bold">+{att.correct_count}</span>
                         {' / '}
-                        <span className="text-red-DEFAULT font-bold">-{att.incorrect_count}</span>
+                        <span className="text-red-600 font-bold">-{att.incorrect_count}</span>
                       </td>
-                      <td className="py-3 px-4">
-                        <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-bold">
+                      <td className="py-3.5 px-4">
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
                           {att.accuracy_percentage}%
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-gray-500">
+                      <td className="py-3.5 px-4 text-slate-500">
                         {new Date(att.submitted_at).toLocaleDateString()}
                       </td>
-                      <td className="py-3 px-4 text-right">
+                      <td className="py-3.5 px-4 text-right">
                         <Link
                           to={`/tests/result/${att.id}`}
-                          className="px-3 py-1 rounded-md bg-gray-100 hover:bg-primary hover:text-white font-semibold transition-colors text-[11px]"
+                          className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white font-semibold transition-colors text-[11px]"
                         >
                           View Analysis
                         </Link>

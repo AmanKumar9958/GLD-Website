@@ -20,7 +20,6 @@ export const AuthModal: React.FC = () => {
         setErrorMsg(res.error || 'Unable to connect to Google. Please try again.')
         setIsLoading(false)
       }
-      // Note: If successful, browser will redirect to Google OAuth consent
     } catch (err: any) {
       setErrorMsg(err.message || 'An unexpected error occurred during sign-in.')
       setIsLoading(false)
@@ -36,49 +35,45 @@ export const AuthModal: React.FC = () => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={closeAuthModal}
-          className="fixed inset-0 bg-primary-dark/70 backdrop-blur-sm"
+          className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs"
         />
 
         {/* Modal Card */}
         <motion.div
-          initial={{ scale: 0.95, opacity: 0, y: 20 }}
+          initial={{ scale: 0.95, opacity: 0, y: 15 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.95, opacity: 0, y: 20 }}
-          transition={{ type: 'spring', duration: 0.4 }}
-          className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden z-10"
+          exit={{ scale: 0.95, opacity: 0, y: 15 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden z-10"
         >
           {/* Header Banner */}
-          <div className="bg-gradient-to-br from-primary via-primary-dark to-[#050B1B] text-white p-7 relative overflow-hidden">
-            {/* Background decorative glow */}
-            <div className="absolute -top-12 -right-12 w-36 h-36 bg-accent-amber/20 rounded-full blur-2xl pointer-events-none" />
-            <div className="absolute -bottom-10 -left-10 w-36 h-36 bg-red-DEFAULT/20 rounded-full blur-2xl pointer-events-none" />
-
+          <div className="bg-slate-950 text-white p-7 relative">
             <button
               onClick={closeAuthModal}
-              className="absolute right-4 top-4 p-1.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+              className="absolute right-4 top-4 p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
               aria-label="Close modal"
             >
               <X size={18} />
             </button>
 
-            <div className="flex items-center gap-3.5 relative z-10">
+            <div className="flex items-center gap-3.5">
               <img
                 src="/icon.png"
                 alt="GLD Logo"
-                className="w-12 h-12 rounded-2xl object-cover border-2 border-white/20 shadow-md"
+                className="w-11 h-11 rounded-xl object-contain ring-1 ring-white/20"
               />
               <div>
-                <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-accent-amber/20 text-accent-amber border border-accent-amber/30">
+                <span className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-amber-500/15 text-accent-gold border border-amber-500/30">
                   Student Portal
                 </span>
-                <h3 className="text-xl font-heading font-bold text-white mt-1">
+                <h3 className="text-xl font-heading font-extrabold text-white mt-1">
                   Sign in to GLD
                 </h3>
               </div>
             </div>
 
-            <p className="text-xs text-gray-300 mt-3 leading-relaxed relative z-10">
-              Access online mock tests, real-time performance analytics, and detailed question solutions.
+            <p className="text-xs text-slate-300 mt-3 leading-relaxed">
+              Access All-India computer-based mock tests, question-by-question solutions, and synced mobile scores.
             </p>
           </div>
 
@@ -96,16 +91,15 @@ export const AuthModal: React.FC = () => {
               type="button"
               onClick={handleGoogleSignIn}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-2xl bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-800 font-semibold text-sm border-2 border-gray-200 hover:border-gray-300 shadow-sm hover:shadow transition-all duration-200 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed group"
+              className="w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-xl bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-800 font-bold text-xs sm:text-sm border border-slate-300 shadow-2xs hover:shadow-subtle transition-all duration-200 active:scale-98 disabled:opacity-60 disabled:cursor-not-allowed group"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                  <Loader2 className="w-4 h-4 animate-spin text-slate-900" />
                   <span>Connecting to Google...</span>
                 </>
               ) : (
                 <>
-                  {/* Google 4-color 'G' Logo */}
                   <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
                     <path
                       fill="#4285F4"
@@ -124,40 +118,40 @@ export const AuthModal: React.FC = () => {
                       d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                     />
                   </svg>
-                  <span className="text-gray-700 group-hover:text-gray-900">Continue with Google</span>
+                  <span className="text-slate-800">Continue with Google</span>
                 </>
               )}
             </button>
 
             {/* Feature Highlights */}
-            <div className="pt-2 border-t border-gray-100 space-y-2.5">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+            <div className="pt-2 border-t border-slate-100 space-y-2.5">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                 Why Sign In with Google?
               </p>
-              <div className="space-y-2 text-xs text-gray-600">
+              <div className="space-y-2 text-xs text-slate-600">
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
                     <Sparkles className="w-3 h-3" />
                   </div>
-                  <span>Instant 1-click access — no password to create or remember</span>
+                  <span>Instant 1-click access — no passwords to remember</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
                     <Smartphone className="w-3 h-3" />
                   </div>
-                  <span>Syncs seamlessly with your GLD Android App account</span>
+                  <span>Syncs automatically with your GLD Android App</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
                     <CheckCircle className="w-3 h-3" />
                   </div>
-                  <span>Live test evaluations, previous attempts, and answer keys</span>
+                  <span>Track test scores, rank percentiles, and detailed solutions</span>
                 </div>
               </div>
             </div>
 
             {/* Disclaimer */}
-            <p className="text-[11px] text-gray-400 text-center leading-normal pt-1">
+            <p className="text-[11px] text-slate-400 text-center leading-normal pt-1">
               By continuing, you agree to GLD Shikshalaya&apos;s Terms of Service and Privacy Policy.
             </p>
           </div>

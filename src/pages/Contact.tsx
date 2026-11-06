@@ -1,182 +1,251 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Mail, Phone, MapPin, MessageSquare, Clock, Sparkles } from 'lucide-react'
+import {
+  Mail,
+  Phone,
+  MapPin,
+  MessageSquare,
+  Clock,
+  Sparkles,
+  Send,
+  CheckCircle2,
+  PhoneCall
+} from 'lucide-react'
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    phone: '',
+    courseInterest: 'Academics (8th-12th)',
     message: ''
   })
+  const [submitted, setSubmitted] = useState(false)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Placeholder for form submission logic
-    console.log(formData)
+    // Open WhatsApp directly with inquiry message
+    const msg = `Hello GLD Shikshalaya, My name is ${formData.name}. I am interested in ${formData.courseInterest}. ${formData.message}`
+    window.open(`https://wa.me/919999302537?text=${encodeURIComponent(msg)}`, '_blank')
+    setSubmitted(true)
   }
 
   const contactInfo = [
-    { icon: Mail, title: "Email", value: "info@gldinstitutions.com" },
-    { icon: Phone, title: "Phone", value: "+91 9999302537" },
-    { icon: MapPin, title: "Address", value: "Milk Shop 12003 Shop 4 Prop No I 1258G I Block, Gali 18 Hari Nagar Extn, Badarpur, New Delhi, Delhi 110044" }
-  ]
-
-  const supportPoints = [
-    { icon: MessageSquare, label: 'Personalized Counselling' },
-    { icon: Clock, label: 'Responses within 24 hours' },
-    { icon: Sparkles, label: 'Guidance for all streams' },
+    {
+      icon: Phone,
+      title: 'Telephone & WhatsApp',
+      value: '+91 9999302537',
+      sub: 'Monday to Saturday • 8:00 AM - 8:00 PM'
+    },
+    {
+      icon: Mail,
+      title: 'Official Email',
+      value: 'info@gldinstitutions.com',
+      sub: 'For admissions and student support'
+    },
+    {
+      icon: MapPin,
+      title: 'Campus Address',
+      value: 'Milk Shop 12003 Shop 4 Prop No I 1258G I Block, Gali 18 Hari Nagar Extn, Badarpur, New Delhi, Delhi 110044',
+      sub: 'Near Gali 18, Hari Nagar Extension'
+    }
   ]
 
   return (
-    <div className="flex-grow overflow-hidden">
-      {/* Hero */}
-      <section
-        className="relative py-20"
-        style={{ background: 'linear-gradient(135deg, #0f1e5c 0%, #1E3A8A 45%, #172D6E 100%)' }}
-      >
-        <div className="absolute inset-0 opacity-10 pointer-events-none"
-          style={{
-            backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)',
-            backgroundSize: '36px 36px',
-          }} />
-        <div className="absolute top-8 right-12 w-64 h-64 rounded-full opacity-15 pointer-events-none"
-          style={{ background: 'radial-gradient(circle, #DC2626 0%, transparent 70%)' }} />
-        <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-4xl md:text-5xl font-heading font-bold text-white mt-6 leading-tight"
-          >
-            We are here to listen, guide and support your journey.
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-white/80 mt-4 text-lg max-w-3xl leading-relaxed"
-          >
-            Reach out for admissions, counselling or partnership opportunities. Our team will respond promptly.
-          </motion.p>
-        </div>
-      </section>
-
-      {/* Content */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-6 lg:px-12">
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Contact Info */}
-            <div className="space-y-6">
-              <div className="p-6 rounded-2xl border border-gray-100 shadow-sm bg-gray-50">
-                <h2 className="text-2xl font-heading font-bold text-primary mb-4">Speak with us</h2>
-                <p className="text-gray-600 mb-6">Share your queries and we will connect you with the right mentor or counsellor.</p>
-                <div className="space-y-5">
-                  {contactInfo.map(({ icon: Icon, title, value }) => (
-                    <div key={title} className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-                        style={{ background: 'linear-gradient(135deg, #1E3A8A, #2563EB)' }}>
-                        <Icon className="text-white" size={22} />
-                      </div>
-                      <div>
-                        <h4 className="font-heading font-semibold text-primary">{title}</h4>
-                        <p className="text-gray-700 text-sm leading-relaxed">{value}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid sm:grid-cols-3 gap-3">
-                {supportPoints.map(({ icon: Icon, label }) => (
-                  <div key={label} className="flex items-center gap-2 px-4 py-3 rounded-xl bg-white border border-gray-100 shadow-sm">
-                    <Icon size={18} className="text-red-DEFAULT" />
-                    <span className="text-sm text-gray-700">{label}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Map Iframe */}
-              <div className="mt-8 rounded-2xl overflow-hidden shadow-sm border border-gray-100 h-64 bg-gray-100 relative">
-                <iframe 
-                  src="https://maps.google.com/maps?q=GLD%20Institutions%2C%20Badarpur%2C%20New%20Delhi&t=&z=15&ie=UTF8&iwloc=&output=embed" 
-                  width="100%" 
-                  height="100%" 
-                  style={{ border: 0 }} 
-                  allowFullScreen={false} 
-                  loading="lazy" 
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Google Maps Location"
-                  className="absolute inset-0"
-                ></iframe>
-              </div>
+    <div className="min-h-screen bg-paper-light text-slate-900 pt-20 sm:pt-24 pb-20 md:pb-12">
+      {/* ── HEADER ── */}
+      <section className="relative py-12 sm:py-16 bg-white border-b border-slate-200/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <div className="badge-gold mb-3.5">
+              <PhoneCall className="w-3.5 h-3.5 text-accent-gold" />
+              <span>ACADEMIC COUNSELING & ADMISSIONS</span>
             </div>
-
-            {/* Form */}
-            <div>
-              <div className="relative rounded-3xl overflow-hidden shadow-xl">
-                <div
-                  className="absolute inset-0"
-                  style={{ background: 'linear-gradient(135deg, #1E3A8A 0%, #172D6E 50%, #0f1e5c 100%)' }}
-                />
-                <div className="relative p-8 md:p-10 text-white">
-                  <h2 className="text-2xl font-heading font-bold mb-2">Send us a message</h2>
-                  <p className="text-white/80 mb-6">Fill out the form and we will get back to you shortly.</p>
-                  <form onSubmit={handleSubmit} className="space-y-5">
-                    <div>
-                      <label htmlFor="name" className="block text-sm text-white/80 mb-2">Name</label>
-                      <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-red-DEFAULT"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="email" className="block text-sm text-white/80 mb-2">Email</label>
-                      <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-red-DEFAULT"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="message" className="block text-sm text-white/80 mb-2">Message</label>
-                      <textarea
-                        id="message"
-                        name="message"
-                        value={formData.message}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-red-DEFAULT"
-                        rows={4}
-                        required
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      className="w-full px-5 py-3 rounded-full font-semibold text-white shadow-lg transition-transform duration-300 hover:scale-105"
-                      style={{ background: 'linear-gradient(135deg, #DC2626, #B91C1C)' }}
-                    >
-                      Send Message
-                    </button>
-                  </form>
-                </div>
-              </div>
-            </div>
+            <h1 className="font-heading font-black text-3xl sm:text-5xl text-slate-950 tracking-tight leading-tight">
+              Connect With Our Faculty & Mentors
+            </h1>
+            <p className="text-slate-600 text-sm sm:text-base mt-3 leading-relaxed">
+              Have questions regarding course batches, CBT test series enrollment, or campus timings? Visit our center or reach out directly via WhatsApp and telephone.
+            </p>
           </div>
         </div>
       </section>
+
+      {/* ── MAIN CONTENT ── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          
+          {/* Left Column: Contact Cards + Map */}
+          <div className="lg:col-span-6 space-y-6">
+            <div className="academic-card p-6 sm:p-7 space-y-6">
+              <h2 className="font-heading font-bold text-xl text-slate-900">
+                Official Campus Details
+              </h2>
+
+              <div className="space-y-5">
+                {contactInfo.map(({ icon: Icon, title, value, sub }) => (
+                  <div key={title} className="flex items-start gap-4">
+                    <div className="w-11 h-11 rounded-xl bg-slate-900 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                      <Icon className="w-5 h-5 text-accent-gold" />
+                    </div>
+                    <div>
+                      <h4 className="font-heading font-bold text-sm text-slate-900">{title}</h4>
+                      <p className="text-slate-800 text-xs sm:text-sm font-medium mt-0.5">{value}</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">{sub}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Support Badges */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="academic-card p-3.5 text-center">
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Consultation</p>
+                <p className="text-xs font-bold text-slate-900 mt-0.5">Free Batch Advice</p>
+              </div>
+              <div className="academic-card p-3.5 text-center">
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Response</p>
+                <p className="text-xs font-bold text-emerald-700 mt-0.5">&lt; 2 Hours</p>
+              </div>
+              <div className="academic-card p-3.5 text-center">
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Mode</p>
+                <p className="text-xs font-bold text-slate-900 mt-0.5">Campus + Online</p>
+              </div>
+            </div>
+
+            {/* Google Map */}
+            <div className="rounded-2xl overflow-hidden shadow-subtle border border-slate-200/90 h-64 bg-slate-100 relative">
+              <iframe
+                src="https://maps.google.com/maps?q=GLD%20Institutions%2C%20Badarpur%2C%20New%20Delhi&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen={false}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Google Maps Campus Location"
+                className="absolute inset-0"
+              />
+            </div>
+          </div>
+
+          {/* Right Column: Inquiry Form */}
+          <div className="lg:col-span-6">
+            <div className="academic-card p-6 sm:p-8 bg-white space-y-6">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-accent-gold">
+                  DIRECT ADMISSIONS INQUIRY
+                </span>
+                <h2 className="font-heading font-black text-2xl sm:text-3xl text-slate-950 mt-1">
+                  Schedule Free Counseling
+                </h2>
+                <p className="text-slate-500 text-xs sm:text-sm mt-1.5 leading-relaxed">
+                  Fill in your details and our admission mentors will contact you via WhatsApp and phone call.
+                </p>
+              </div>
+
+              {submitted ? (
+                <div className="p-6 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-3">
+                  <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
+                  <h3 className="font-heading font-bold text-lg text-emerald-900">Inquiry Sent Successfully!</h3>
+                  <p className="text-xs text-emerald-800">
+                    We have forwarded your details to our campus team. You can also chat directly with us on WhatsApp at +91 9999302537.
+                  </p>
+                  <button
+                    onClick={() => setSubmitted(false)}
+                    className="px-5 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold"
+                  >
+                    Submit Another Query
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label htmlFor="name" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                      Student / Parent Name *
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="e.g. Aman Kumar"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-slate-50/50"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="phone" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                      WhatsApp / Phone Number *
+                    </label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      placeholder="+91 98765 43210"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-slate-50/50"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="courseInterest" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                      Program Interested In *
+                    </label>
+                    <select
+                      id="courseInterest"
+                      name="courseInterest"
+                      value={formData.courseInterest}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-slate-50/50"
+                    >
+                      <option value="Academics (8th-10th All Subjects)">Class 8th to 10th (All Subjects)</option>
+                      <option value="Academics (11th-12th PCB)">Class 11th & 12th (Science PCB)</option>
+                      <option value="Academics (11th-12th Arts)">Class 11th & 12th (Arts Stream)</option>
+                      <option value="CBT Mock Test Series (Court & SSC)">Competitive CBT Mock Test Series</option>
+                      <option value="Computer Applications (DCA / ADCA)">Computer Applications (DCA / ADCA)</option>
+                      <option value="Spoken English & Communication">Spoken English & Personality</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="message" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                      Your Query or Message (Optional)
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      placeholder="Ask about batch timings, fee concessions, or hostel recommendations..."
+                      rows={4}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-slate-50/50"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-3.5 px-6 rounded-xl font-bold text-xs tracking-wider uppercase text-white bg-primary-dark hover:bg-primary shadow-subtle hover:shadow-md transition-all active:scale-98 flex items-center justify-center gap-2"
+                  >
+                    <Send className="w-4 h-4 text-accent-gold" />
+                    <span>Send Inquiry on WhatsApp</span>
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
   )
 }
