@@ -46,7 +46,7 @@ export async function fetchTestById(testId: string): Promise<MockTest | null> {
     .from('mock_tests')
     .select('*')
     .eq('id', testId)
-    .single()
+    .maybeSingle()
 
   if (error) throw error
   return data
@@ -57,14 +57,15 @@ export async function fetchTestById(testId: string): Promise<MockTest | null> {
  */
 export async function fetchTestWithQuestions(
   testId: string,
-): Promise<{ test: MockTest; questions: TestQuestion[] }> {
+): Promise<{ test: MockTest | null; questions: TestQuestion[] }> {
   const { data: test, error: tErr } = await supabase
     .from('mock_tests')
     .select('*')
     .eq('id', testId)
-    .single()
+    .maybeSingle()
 
   if (tErr) throw tErr
+  if (!test) return { test: null, questions: [] }
 
   const { data: questions, error: qErr } = await supabase
     .from('test_questions')
@@ -202,6 +203,7 @@ export async function fetchAttemptDetails(
   if (aErr) throw aErr
 
   const { test, questions } = await fetchTestWithQuestions(attempt.test_id)
+  if (!test) throw new Error('Test not found or deleted')
 
   return { attempt, test, questions }
 }

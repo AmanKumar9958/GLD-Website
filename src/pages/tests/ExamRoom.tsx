@@ -53,6 +53,9 @@ export const ExamRoom: React.FC = () => {
       try {
         setIsLoading(true)
         const data = await fetchTestWithQuestions(id)
+        if (!data.test) {
+          throw new Error('Test not found or deleted')
+        }
         setTest(data.test)
         setQuestions(data.questions)
 

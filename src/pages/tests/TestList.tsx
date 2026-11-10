@@ -299,37 +299,48 @@ export const TestList: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {attempts.slice(0, 10).map((att) => (
-                    <tr key={att.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="py-3.5 px-4 font-bold text-slate-900 max-w-xs truncate">
-                        {tests.find((t) => t.id === att.test_id)?.title || 'Mock Test'}
-                      </td>
-                      <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
-                        {att.score} <span className="text-slate-400 font-normal">/{att.total_marks}</span>
-                      </td>
-                      <td className="py-3.5 px-4 text-slate-700">
-                        <span className="text-emerald-700 font-bold">+{att.correct_count}</span>
-                        {' / '}
-                        <span className="text-red-600 font-bold">-{att.incorrect_count}</span>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
-                          {att.accuracy_percentage}%
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 text-slate-500">
-                        {new Date(att.submitted_at).toLocaleDateString()}
-                      </td>
-                      <td className="py-3.5 px-4 text-right">
-                        <Link
-                          to={`/tests/result/${att.id}`}
-                          className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white font-semibold transition-colors text-[11px]"
-                        >
-                          View Analysis
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
+                  {attempts.slice(0, 10).map((att) => {
+                    const testObj = tests.find((t) => t.id === att.test_id)
+                    const isAvailable = Boolean(testObj && testObj.is_published)
+
+                    return (
+                      <tr key={att.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="py-3.5 px-4 font-bold text-slate-900 max-w-xs truncate">
+                          {testObj?.title || 'Archived / Deleted Test'}
+                        </td>
+                        <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
+                          {att.score} <span className="text-slate-400 font-normal">/{att.total_marks}</span>
+                        </td>
+                        <td className="py-3.5 px-4 text-slate-700">
+                          <span className="text-emerald-700 font-bold">+{att.correct_count}</span>
+                          {' / '}
+                          <span className="text-red-600 font-bold">-{att.incorrect_count}</span>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
+                            {att.accuracy_percentage}%
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-slate-500">
+                          {new Date(att.submitted_at).toLocaleDateString()}
+                        </td>
+                        <td className="py-3.5 px-4 text-right">
+                          {isAvailable ? (
+                            <Link
+                              to={`/tests/result/${att.id}`}
+                              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white font-semibold transition-colors text-[11px]"
+                            >
+                              View Analysis
+                            </Link>
+                          ) : (
+                            <span className="px-2.5 py-1 rounded-md bg-slate-100 text-slate-400 text-[11px] font-medium select-none">
+                              Expired
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
