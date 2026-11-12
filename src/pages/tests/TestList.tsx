@@ -84,6 +84,33 @@ export const TestList: React.FC = () => {
     return map
   }, [attempts])
 
+  // Chronological attempt order per test_id to identify reattempts
+  const attemptOrderMap = useMemo(() => {
+    const map: Record<string, { attemptNumber: number; totalAttempts: number; isReattempt: boolean }> = {}
+    const grouped: Record<string, TestAttempt[]> = {}
+
+    attempts.forEach((a) => {
+      if (!grouped[a.test_id]) grouped[a.test_id] = []
+      grouped[a.test_id].push(a)
+    })
+
+    Object.values(grouped).forEach((group) => {
+      const sorted = [...group].sort(
+        (a, b) => new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime()
+      )
+      const total = sorted.length
+      sorted.forEach((att, index) => {
+        map[att.id] = {
+          attemptNumber: index + 1,
+          totalAttempts: total,
+          isReattempt: index > 0,
+        }
+      })
+    })
+
+    return map
+  }, [attempts])
+
   const handleStartTest = (test: MockTest) => {
     if (!user) {
       openAuthModal()
@@ -302,11 +329,20 @@ export const TestList: React.FC = () => {
                   {attempts.slice(0, 10).map((att) => {
                     const testObj = tests.find((t) => t.id === att.test_id)
                     const isAvailable = Boolean(testObj && testObj.is_published)
+                    const attemptInfo = attemptOrderMap[att.id]
+                    const isReattempt = attemptInfo?.isReattempt ?? false
 
                     return (
                       <tr key={att.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="py-3.5 px-4 font-bold text-slate-900 max-w-xs truncate">
-                          {testObj?.title || 'Archived / Deleted Test'}
+                        <td className="py-3.5 px-4 font-bold text-slate-900 max-w-xs">
+                          <div className="flex items-center gap-2">
+                            <span className="truncate">{testObj?.title || 'Archived / Deleted Test'}</span>
+                            {isReattempt && (
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase tracking-wider shrink-0">
+                                Reattempt
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
                           {att.score} <span className="text-slate-400 font-normal">/{att.total_marks}</span>
