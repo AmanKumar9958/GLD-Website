@@ -1,5 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { ArrowRight, BookOpen, Computer, Briefcase, GraduationCap, Users, Award, Clock, CheckCircle, ChevronRight, Play, Smartphone } from 'lucide-react'
+import {
+  ArrowRight,
+  BookOpen,
+  Computer,
+  Briefcase,
+  GraduationCap,
+  Users,
+  Award,
+  Clock,
+  CheckCircle,
+  ChevronRight,
+  Play,
+  Smartphone,
+  Star,
+  Zap,
+  CheckCircle2,
+  Bell,
+} from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import gsap from 'gsap'
@@ -391,63 +408,288 @@ const Home: React.FC = () => {
       </section>
 
       {/* ── APP DOWNLOAD SECTION ── */}
-      <section className="bg-primary-dark py-12 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none" />
-        <div className="absolute -right-20 -top-20 w-64 h-64 bg-accent-amber/20 rounded-full blur-[80px]" />
-        <div className="absolute -left-20 -bottom-20 w-64 h-64 bg-blue-500/20 rounded-full blur-[80px]" />
-        
+      <section className="relative py-20 lg:py-28 bg-[#030712] overflow-hidden">
+        {/* Ambient Glow Orbs */}
+        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-blue-600/20 rounded-full blur-[130px] pointer-events-none" />
+        <div className="absolute bottom-10 right-0 w-[450px] h-[450px] bg-accent-amber/15 rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute inset-0 opacity-5 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
+
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 lg:p-8 shadow-[0_0_50px_rgba(0,0,0,0.3)]">
-            <div className="flex-1 text-center md:text-left">
-              <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-3 py-1 mb-4 border border-white/10">
-                <Smartphone size={14} className="text-accent-amber" />
-                <span className="text-white text-[10px] font-bold tracking-widest uppercase">Android Exclusive</span>
-              </div>
-              <h2 className="text-2xl md:text-3xl font-heading font-black text-white mb-3 leading-tight">
-                Learn Anywhere, Anytime
-              </h2>
-              <p className="text-gray-300 text-sm md:text-base mb-6 max-w-lg mx-auto md:mx-0 leading-relaxed font-body">
-                Take your learning journey on the go. Download the GLD Shikshalaya app exclusively from the Google Play Store for courses, mock tests, and live classes.
-              </p>
-              
-              <a 
-                href="https://play.google.com/store/apps/details?id=com.solostackdev.gldshikshalaya"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 bg-white hover:bg-gray-100 text-primary-dark px-6 py-3 rounded-full font-bold shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all hover:scale-105 group"
-              >
-                <div className="bg-primary-dark/10 p-1.5 rounded-full group-hover:bg-primary-dark/20 transition-colors">
-                  <Play size={18} className="fill-primary-dark text-primary-dark" />
-                </div>
-                <div className="flex flex-col text-left">
-                  <span className="text-[9px] uppercase tracking-widest text-gray-500 font-bold mb-0.5 leading-none">Get it on</span>
-                  <span className="text-base font-black leading-none">Google Play</span>
-                </div>
-              </a>
-            </div>
+          <div className="relative rounded-3xl lg:rounded-[40px] bg-gradient-to-br from-white/[0.08] via-white/[0.03] to-white/[0.01] border border-white/10 p-8 sm:p-12 lg:p-16 backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,0.6)] overflow-hidden">
             
-            <div className="w-full max-w-[180px] relative hidden md:block">
-              <motion.div 
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="relative"
-              >
-                <div className="absolute inset-0 bg-accent-amber rounded-2xl transform rotate-6 scale-105 opacity-20 blur-md" />
-                <img 
-                  src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=400&q=80" 
-                  alt="App Mobile Interface" 
-                  className="w-full h-auto rounded-2xl shadow-xl border-2 border-white/10 transform hover:-translate-y-1 transition-transform duration-500 object-cover aspect-[9/19]"
-                />
-              </motion.div>
+            {/* Background subtle diagonal glow */}
+            <div className="absolute -top-32 -right-32 w-96 h-96 bg-primary-light/20 rounded-full blur-[100px] pointer-events-none" />
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+              
+              {/* Left Column: Value Prop, Features & CTA */}
+              <div className="lg:col-span-7 text-center lg:text-left space-y-6">
+                
+                {/* Pill Tag */}
+                <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-bold tracking-wide uppercase">
+                  <Smartphone className="w-3.5 h-3.5" />
+                  <span>Android App • Available on Google Play</span>
+                </div>
+
+                {/* Main Heading */}
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-black text-white leading-[1.15] tracking-tight">
+                  Crack Your Exams{' '}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-amber via-yellow-300 to-amber-500">
+                    Anywhere, Anytime
+                  </span>
+                </h2>
+
+                {/* Subtitle */}
+                <p className="text-gray-300 text-sm sm:text-base leading-relaxed max-w-xl mx-auto lg:mx-0">
+                  Take your learning journey on the go. Experience real computer-based mock tests, live and recorded lectures, instant question explanations, and smart performance tracking directly on your mobile device.
+                </p>
+
+                {/* 4 Feature Points Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2 text-left">
+                  <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-white/[0.04] border border-white/5 hover:border-white/15 transition-colors">
+                    <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 flex-shrink-0">
+                      <Zap className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-white">Full CBT Exam Engine</h4>
+                      <p className="text-[11px] text-gray-400 mt-0.5">Real exam timers, negative marking & palette</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-white/[0.04] border border-white/5 hover:border-white/15 transition-colors">
+                    <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 flex-shrink-0">
+                      <CheckCircle2 className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-white">Instant Solutions & Keys</h4>
+                      <p className="text-[11px] text-gray-400 mt-0.5">Detailed step-by-step reasoning for all Qs</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-white/[0.04] border border-white/5 hover:border-white/15 transition-colors">
+                    <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 flex-shrink-0">
+                      <BookOpen className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-white">Video Classes & Notes</h4>
+                      <p className="text-[11px] text-gray-400 mt-0.5">Curated syllabus lectures & downloadable PDFs</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-white/[0.04] border border-white/5 hover:border-white/15 transition-colors">
+                    <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400 flex-shrink-0">
+                      <Bell className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-white">Live Exam Updates</h4>
+                      <p className="text-[11px] text-gray-400 mt-0.5">Timely test release & notification alerts</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Call To Action Buttons & Social Proof */}
+                <div className="pt-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5">
+                  <a
+                    href="https://play.google.com/store/apps/details?id=com.solostackdev.gldshikshalaya"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-4 bg-white hover:bg-gray-100 active:scale-95 text-gray-900 px-6 py-3.5 rounded-2xl font-bold shadow-[0_10px_30px_rgba(255,255,255,0.15)] transition-all group"
+                  >
+                    {/* Official Multi-colored Google Play Store Triangle Icon */}
+                    <svg className="w-7 h-7 flex-shrink-0" viewBox="0 0 24 24">
+                      <path fill="#4285F4" d="M3.6 1.48L14.37 12 3.6 22.52c-.38-.34-.6-.83-.6-1.37V2.85c0-.54.22-1.03.6-1.37z" />
+                      <path fill="#FBBC04" d="M17.7 8.78L14.37 12l3.33 3.22 3.75-2.15c.67-.38.67-1.76 0-2.14l-3.75-2.15z" />
+                      <path fill="#34A853" d="M14.37 12L3.6 22.52c.45.41 1.13.46 1.69.14l12.41-7.14L14.37 12z" />
+                      <path fill="#EA4335" d="M17.7 8.78L5.29 1.64C4.73 1.32 4.05 1.37 3.6 1.78L14.37 12l3.33-3.22z" />
+                    </svg>
+                    <div className="flex flex-col text-left">
+                      <span className="text-[10px] uppercase tracking-wider text-gray-500 font-bold leading-none">GET IT ON</span>
+                      <span className="text-lg font-black text-gray-900 leading-tight mt-0.5 group-hover:text-primary transition-colors">Google Play</span>
+                    </div>
+                  </a>
+
+                  {/* Rating / Social Proof */}
+                  <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white/[0.05] border border-white/10 text-left">
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-1 text-amber-400">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                        ))}
+                      </div>
+                      <span className="text-xs font-bold text-white mt-1">4.9 / 5.0 Rating</span>
+                      <span className="text-[10px] text-gray-400">10,000+ Students Enrolled</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Right Column: Realistic Android CBT Exam Mockup */}
+              <div className="lg:col-span-5 flex justify-center relative">
+                
+                {/* Ambient Behind-Phone Glow */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/30 to-amber-500/20 rounded-full blur-[80px] -z-10 scale-90" />
+
+                {/* Floating Glass Badge 1 (Top Left) */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="absolute -top-4 -left-4 sm:-left-8 z-20 hidden sm:flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-gray-900/90 border border-white/20 backdrop-blur-xl shadow-2xl"
+                >
+                  <div className="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
+                    ✓
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-bold text-white leading-tight">100% CBT Simulation</p>
+                    <p className="text-[9px] text-gray-400">Timer & Negative Marking</p>
+                  </div>
+                </motion.div>
+
+                {/* Floating Glass Badge 2 (Bottom Right) */}
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                  className="absolute -bottom-4 -right-4 sm:-right-6 z-20 hidden sm:flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-gray-900/90 border border-white/20 backdrop-blur-xl shadow-2xl"
+                >
+                  <div className="w-7 h-7 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">
+                    ★
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-bold text-white leading-tight">Instant Analysis</p>
+                    <p className="text-[9px] text-gray-400">Sectional Marks & Solution</p>
+                  </div>
+                </motion.div>
+
+                {/* Device Frame */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: 30 }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.7 }}
+                  className="w-[275px] sm:w-[300px] bg-[#0A1128] rounded-[44px] p-3 border-[6px] border-gray-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative"
+                >
+                  {/* Punch Hole Camera */}
+                  <div className="absolute top-5 left-1/2 -translate-x-1/2 w-4 h-4 bg-black rounded-full border border-gray-800 z-30" />
+
+                  {/* Inner Screen */}
+                  <div className="rounded-[34px] overflow-hidden bg-slate-900 text-white border border-white/5 select-none text-left">
+                    
+                    {/* Status Bar */}
+                    <div className="px-6 pt-3 pb-2 flex justify-between items-center text-[10px] text-gray-400 font-medium">
+                      <span>4:30 PM</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[9px] font-bold text-emerald-400">5G</span>
+                        <div className="w-4 h-2 border border-gray-400 rounded-sm p-0.5 flex items-center">
+                          <div className="w-full h-full bg-emerald-400 rounded-2xs" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* App Header Inside Phone */}
+                    <div className="px-4 py-2.5 bg-primary border-b border-white/10 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <img src="/icon.png" alt="GLD" className="w-6 h-6 rounded-full object-cover" />
+                        <span className="text-xs font-bold font-heading text-white tracking-wide">GLD Shikshalaya</span>
+                      </div>
+                      <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-amber-400">
+                        ⚡
+                      </div>
+                    </div>
+
+                    {/* App Screen Content: Active Exam Room */}
+                    <div className="p-3.5 space-y-3 bg-[#0d1630]">
+                      
+                      {/* Active Test Card */}
+                      <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-900/60 to-indigo-900/60 border border-blue-400/20">
+                        <div className="flex items-center justify-between text-[10px]">
+                          <span className="px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 font-bold tracking-wide">
+                            ● LIVE EXAM
+                          </span>
+                          <span className="font-mono font-bold text-amber-300 bg-black/40 px-2 py-0.5 rounded-md">
+                            ⏱ 58:42
+                          </span>
+                        </div>
+                        <h5 className="text-xs font-bold text-white mt-1.5 leading-snug">
+                          SSC CGL Tier-I Mock #01
+                        </h5>
+                      </div>
+
+                      {/* Section Tabs */}
+                      <div className="flex gap-1.5 overflow-x-hidden text-[10px]">
+                        <span className="px-2.5 py-1 rounded-lg bg-primary text-white font-bold whitespace-nowrap border border-white/20">
+                          Reasoning
+                        </span>
+                        <span className="px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 whitespace-nowrap">
+                          General Awareness
+                        </span>
+                        <span className="px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 whitespace-nowrap">
+                          Quant
+                        </span>
+                      </div>
+
+                      {/* Question Card */}
+                      <div className="p-3 rounded-2xl bg-white/[0.05] border border-white/10 space-y-2">
+                        <div className="flex justify-between text-[9px] text-gray-400">
+                          <span className="font-bold text-white">Q.4 of 100</span>
+                          <span className="text-emerald-400 font-semibold">+2.0 / -0.5</span>
+                        </div>
+                        <p className="text-[11px] text-gray-200 leading-snug">
+                          Select the option that is related to the third term in the same way as the second term:
+                        </p>
+                        
+                        {/* Options */}
+                        <div className="space-y-1.5 pt-1">
+                          <div className="p-2 rounded-xl bg-white/5 border border-white/5 text-[10px] text-gray-300 flex items-center gap-2">
+                            <span className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-[9px]">A</span>
+                            <span>Aptitude</span>
+                          </div>
+                          <div className="p-2 rounded-xl bg-primary/40 border border-primary text-[10px] text-white flex items-center justify-between font-semibold shadow-sm">
+                            <div className="flex items-center gap-2">
+                              <span className="w-4 h-4 rounded-full bg-primary text-white flex items-center justify-center text-[9px]">B</span>
+                              <span>General Intelligence</span>
+                            </div>
+                            <span className="text-accent-amber text-xs">✓</span>
+                          </div>
+                          <div className="p-2 rounded-xl bg-white/5 border border-white/5 text-[10px] text-gray-300 flex items-center gap-2">
+                            <span className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-[9px]">C</span>
+                            <span>Language Comprehension</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action Bar */}
+                      <div className="flex gap-2 pt-1">
+                        <button className="flex-1 py-1.5 rounded-xl bg-white/10 text-gray-300 text-[10px] font-semibold">
+                          Review
+                        </button>
+                        <button className="flex-1 py-1.5 rounded-xl bg-primary text-white text-[10px] font-bold shadow-md">
+                          Save & Next →
+                        </button>
+                      </div>
+
+                    </div>
+
+                    {/* Bottom Navigation Home Bar */}
+                    <div className="py-2 flex justify-center bg-slate-900">
+                      <div className="w-24 h-1 bg-gray-600 rounded-full" />
+                    </div>
+
+                  </div>
+                </motion.div>
+
+              </div>
+
             </div>
           </div>
         </div>
       </section>
-
     </div>
   )
 }
 
-export default Home
+export default Home;
+
