@@ -73,13 +73,39 @@ export const TestList: React.FC = () => {
     })
   }, [tests, selectedCategory, searchQuery])
 
-  // Quick map of testId -> best attempt
-  const attemptMap = useMemo(() => {
+  // Map of testId -> LATEST attempt by submission date
+  const latestAttemptMap = useMemo(() => {
+    const map: Record<string, TestAttempt> = {}
+    attempts.forEach((a) => {
+      if (!map[a.test_id]) {
+        map[a.test_id] = a
+      } else {
+        const existingTime = new Date(map[a.test_id].submitted_at).getTime()
+        const newTime = new Date(a.submitted_at).getTime()
+        if (newTime > existingTime) {
+          map[a.test_id] = a
+        }
+      }
+    })
+    return map
+  }, [attempts])
+
+  // Map of testId -> best attempt by score
+  const bestAttemptMap = useMemo(() => {
     const map: Record<string, TestAttempt> = {}
     attempts.forEach((a) => {
       if (!map[a.test_id] || a.score > map[a.test_id].score) {
         map[a.test_id] = a
       }
+    })
+    return map
+  }, [attempts])
+
+  // Count of attempts per test
+  const attemptCountMap = useMemo(() => {
+    const map: Record<string, number> = {}
+    attempts.forEach((a) => {
+      map[a.test_id] = (map[a.test_id] || 0) + 1
     })
     return map
   }, [attempts])
@@ -212,7 +238,9 @@ export const TestList: React.FC = () => {
         {!isLoading && filteredTests.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredTests.map((test) => {
-              const previousAttempt = attemptMap[test.id]
+              const latestAttempt = latestAttemptMap[test.id]
+              const bestAttempt = bestAttemptMap[test.id]
+              const attemptCount = attemptCountMap[test.id] || 0
 
               return (
                 <div
@@ -262,23 +290,35 @@ export const TestList: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Previous Attempt Summary if Available */}
-                    {previousAttempt && (
+                    {/* Latest Attempt Summary if Available */}
+                    {latestAttempt && (
                       <div className="mb-4 p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200/60 flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1.5 text-emerald-900 font-medium">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <div className="flex items-center gap-1.5 text-emerald-900 font-medium flex-wrap">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                           <span>Last Score:</span>
-                          <span className="font-bold">{previousAttempt.score}/{test.total_marks}</span>
+                          <span className="font-bold">{latestAttempt.score}/{test.total_marks}</span>
+                          {attemptCount > 1 && (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-700">
+                              Attempt #{attemptCount}
+                            </span>
+                          )}
                         </div>
-                        <button
-                          onClick={() => {
-                            grantAttemptAccess(previousAttempt.id)
-                            navigate(`/tests/result/${previousAttempt.id}`)
-                          }}
-                          className="text-[11px] font-bold text-emerald-700 hover:underline flex items-center cursor-pointer"
-                        >
-                          Review <ChevronRight className="w-3 h-3" />
-                        </button>
+                        <div className="flex items-center gap-2">
+                          {attemptCount > 1 && bestAttempt && bestAttempt.id !== latestAttempt.id && (
+                            <span className="text-[10px] text-slate-500 font-medium hidden sm:inline">
+                              Best: {bestAttempt.score}/{test.total_marks}
+                            </span>
+                          )}
+                          <button
+                            onClick={() => {
+                              grantAttemptAccess(latestAttempt.id)
+                              navigate(`/tests/result/${latestAttempt.id}`)
+                            }}
+                            className="text-[11px] font-bold text-emerald-700 hover:underline flex items-center cursor-pointer"
+                          >
+                            Review <ChevronRight className="w-3 h-3" />
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -288,7 +328,7 @@ export const TestList: React.FC = () => {
                     onClick={() => handleStartTest(test)}
                     className="w-full py-3 px-4 rounded-xl bg-primary-dark hover:bg-primary text-white font-bold text-xs tracking-wider uppercase transition-all duration-200 flex items-center justify-center gap-2 shadow-2xs hover:shadow-md active:scale-98"
                   >
-                    <span>{previousAttempt ? 'Retake Examination' : 'Start Mock Test'}</span>
+                    <span>{latestAttempt ? 'Retake Examination' : 'Start Mock Test'}</span>
                     <ArrowRight className="w-3.5 h-3.5 text-accent-gold" />
                   </button>
                 </div>

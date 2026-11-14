@@ -28,7 +28,7 @@ const Footer: React.FC = () => {
     <footer className="relative bg-slate-950 text-white overflow-hidden pt-16 sm:pt-20 pb-24 md:pb-12 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 sm:gap-12 mb-14">
-          
+
           {/* Col 1: Brand & Description */}
           <div className="md:col-span-5 space-y-4">
             <Link to="/" className="flex items-center gap-3 group inline-flex">
@@ -115,10 +115,10 @@ const Footer: React.FC = () => {
                 <Phone className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                 <span>+91 9999302537</span>
               </p>
-              <p className="flex items-center gap-2">
+              {/* <p className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-blue-400 flex-shrink-0" />
                 <span>info@gldinstitutions.com</span>
-              </p>
+              </p> */}
             </div>
 
             <div className="flex gap-2.5 pt-2">

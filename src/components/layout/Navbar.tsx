@@ -72,11 +72,10 @@ const Navbar: React.FC = () => {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.35, ease: 'easeOut' }}
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-          scrolled
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${scrolled
             ? 'bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-subtle py-2.5'
             : 'bg-white/80 backdrop-blur-sm border-b border-slate-100 py-3.5'
-        }`}
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           {/* Brand Identity */}
@@ -94,7 +93,7 @@ const Navbar: React.FC = () => {
                   GLD SHIKSHALAYA
                 </span>
                 <span className="hidden lg:inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200/80">
-                  EST. 2014
+                  EST. 2020
                 </span>
               </div>
               <span className="text-[10px] sm:text-[11px] font-medium text-slate-500 tracking-wide uppercase">
@@ -111,11 +110,10 @@ const Navbar: React.FC = () => {
                 <Link
                   key={path}
                   to={path}
-                  className={`relative px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 flex items-center gap-1.5 ${
-                    isActive
+                  className={`relative px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 flex items-center gap-1.5 ${isActive
                       ? 'bg-white text-primary-dark shadow-sm'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                  }`}
+                    }`}
                 >
                   {label}
                   {badge && (
@@ -333,11 +331,10 @@ const Navbar: React.FC = () => {
                       key={path}
                       to={path}
                       onClick={() => setMenuOpen(false)}
-                      className={`flex items-center justify-between px-3.5 py-3 rounded-xl font-heading font-semibold text-base transition-colors ${
-                        isActive
+                      className={`flex items-center justify-between px-3.5 py-3 rounded-xl font-heading font-semibold text-base transition-colors ${isActive
                           ? 'bg-primary-50 text-primary font-bold'
                           : 'text-slate-700 hover:bg-slate-50'
-                      }`}
+                        }`}
                     >
                       <span>{label}</span>
                       {badge && (
@@ -374,9 +371,8 @@ const Navbar: React.FC = () => {
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 py-1.5 px-3 flex items-center justify-around shadow-lg">
         <Link
           to="/"
-          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-lg text-[10px] font-medium transition-colors ${
-            location.pathname === '/' ? 'text-primary font-bold' : 'text-slate-500 hover:text-slate-800'
-          }`}
+          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-lg text-[10px] font-medium transition-colors ${location.pathname === '/' ? 'text-primary font-bold' : 'text-slate-500 hover:text-slate-800'
+            }`}
         >
           <HomeIcon className="w-4 h-4" />
           <span>Home</span>
@@ -384,9 +380,8 @@ const Navbar: React.FC = () => {
 
         <Link
           to="/courses"
-          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-lg text-[10px] font-medium transition-colors ${
-            location.pathname === '/courses' ? 'text-primary font-bold' : 'text-slate-500 hover:text-slate-800'
-          }`}
+          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-lg text-[10px] font-medium transition-colors ${location.pathname === '/courses' ? 'text-primary font-bold' : 'text-slate-500 hover:text-slate-800'
+            }`}
         >
           <BookOpen className="w-4 h-4" />
           <span>Courses</span>
@@ -395,11 +390,10 @@ const Navbar: React.FC = () => {
         {/* Central Prominent Mock Test Action Button */}
         <Link
           to="/tests"
-          className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl text-[10px] font-bold transition-all relative ${
-            location.pathname.startsWith('/tests')
+          className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl text-[10px] font-bold transition-all relative ${location.pathname.startsWith('/tests')
               ? 'text-white bg-primary-dark shadow-sm'
               : 'text-amber-900 bg-amber-100/90 border border-amber-300/80'
-          }`}
+            }`}
         >
           <Sparkles className="w-4 h-4 text-accent-gold" />
           <span>CBT Tests</span>
@@ -407,9 +401,8 @@ const Navbar: React.FC = () => {
 
         <Link
           to="/contact"
-          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-lg text-[10px] font-medium transition-colors ${
-            location.pathname === '/contact' ? 'text-primary font-bold' : 'text-slate-500 hover:text-slate-800'
-          }`}
+          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-lg text-[10px] font-medium transition-colors ${location.pathname === '/contact' ? 'text-primary font-bold' : 'text-slate-500 hover:text-slate-800'
+            }`}
         >
           <Phone className="w-4 h-4" />
           <span>Contact</span>

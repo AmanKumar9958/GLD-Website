@@ -14,9 +14,12 @@ import {
   X,
   Lightbulb,
   Sparkles,
-  ShieldAlert
+  ShieldAlert,
+  History,
+  ChevronRight,
+  TrendingUp
 } from 'lucide-react'
-import { fetchAttemptDetails, isAttemptAccessGranted } from '../../services/testService'
+import { fetchAttemptDetails, isAttemptAccessGranted, fetchStudentAttempts, grantAttemptAccess } from '../../services/testService'
 import { MockTest, TestQuestion, TestAttempt } from '../../types/test'
 import { useAuth } from '../../context/AuthContext'
 
@@ -28,6 +31,7 @@ export const TestResult: React.FC = () => {
   const [attempt, setAttempt] = useState<TestAttempt | null>(null)
   const [test, setTest] = useState<MockTest | null>(null)
   const [questions, setQuestions] = useState<TestQuestion[]>([])
+  const [allAttempts, setAllAttempts] = useState<TestAttempt[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [accessDeniedReason, setAccessDeniedReason] = useState<string | null>(null)
 
@@ -117,6 +121,17 @@ export const TestResult: React.FC = () => {
         setAttempt(data.attempt)
         setTest(data.test)
         setQuestions(data.questions)
+
+        // Load all attempts made by this student for this specific test
+        try {
+          const userAttempts = await fetchStudentAttempts(user.id)
+          const testAttempts = userAttempts
+            .filter((a) => a.test_id === data.attempt.test_id)
+            .sort((a, b) => new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime())
+          setAllAttempts(testAttempts)
+        } catch (attErr) {
+          console.error('Failed to load all student attempts for test:', attErr)
+        }
 
         // If score is >= 40%, trigger celebratory confetti
         const pct = (data.attempt.score / data.attempt.total_marks) * 100
@@ -237,6 +252,9 @@ export const TestResult: React.FC = () => {
 
   const attemptedCount = attempt.correct_count + attempt.incorrect_count
   const scorePct = ((attempt.score / attempt.total_marks) * 100).toFixed(1)
+  const currentAttemptIndex = allAttempts.findIndex((a) => a.id === attempt.id)
+  const currentAttemptNumber = currentAttemptIndex !== -1 ? currentAttemptIndex + 1 : 1
+  const isLatestAttempt = allAttempts.length > 0 && attempt.id === allAttempts[allAttempts.length - 1].id
 
   return (
     <div className="min-h-screen bg-paper-light text-slate-900 pt-20 sm:pt-24 pb-20 select-none">
@@ -253,9 +271,16 @@ export const TestResult: React.FC = () => {
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
-                  Performance Scorecard
-                </span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
+                    Performance Scorecard
+                  </span>
+                  {allAttempts.length > 1 && (
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded border border-indigo-200">
+                      Attempt #{currentAttemptNumber} of {allAttempts.length} {isLatestAttempt && '(Latest Attempt)'}
+                    </span>
+                  )}
+                </div>
                 <h1 className="font-heading font-black text-2xl sm:text-3xl text-slate-950 mt-1">
                   {test.title}
                 </h1>
@@ -274,6 +299,56 @@ export const TestResult: React.FC = () => {
       </section>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+        {/* Attempt Quick-Switcher Banner (if multiple attempts) */}
+        {allAttempts.length > 1 && (
+          <div className="mb-6 p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+              <div className="flex items-center gap-2">
+                <History className="w-4 h-4 text-accent-gold" />
+                <span className="text-xs font-bold text-slate-900">Switch Between Your Attempts:</span>
+                <span className="text-[11px] text-slate-500 font-medium">({allAttempts.length} total recorded)</span>
+              </div>
+              <span className="text-[11px] text-slate-400">Click any attempt to view its full scorecard & solutions</span>
+            </div>
+
+            <div className="flex items-center gap-2.5 flex-wrap">
+              {allAttempts.map((att, idx) => {
+                const isCurrent = att.id === attempt.id
+                const isLatest = idx === allAttempts.length - 1
+                return (
+                  <button
+                    key={att.id}
+                    onClick={() => {
+                      if (!isCurrent) {
+                        grantAttemptAccess(att.id)
+                        navigate(`/tests/result/${att.id}`)
+                      }
+                    }}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                      isCurrent
+                        ? 'bg-slate-900 text-white shadow-sm ring-2 ring-primary/40'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200'
+                    }`}
+                  >
+                    <span>Attempt #{idx + 1}: <strong className={isCurrent ? 'text-accent-gold' : 'text-slate-900'}>{att.score}/{att.total_marks}</strong></span>
+                    <span className="text-[10px] text-slate-400">({att.accuracy_percentage}%)</span>
+                    {isLatest && (
+                      <span className={`text-[9px] px-1.5 py-0.5 rounded font-black uppercase tracking-wider ${
+                        isCurrent ? 'bg-amber-400 text-slate-950' : 'bg-indigo-100 text-indigo-700'
+                      }`}>
+                        Latest
+                      </span>
+                    )}
+                    {isCurrent && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
         {/* 3 Primary Score Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           {/* Total Marks */}
@@ -366,7 +441,7 @@ export const TestResult: React.FC = () => {
             }`}
           >
             <Target className="w-4 h-4 text-accent-gold" />
-            <span>Sectional Breakdown</span>
+            <span>Review & Analysis {allAttempts.length > 0 && `(${allAttempts.length} Attempts)`}</span>
           </button>
 
           <button
@@ -382,12 +457,127 @@ export const TestResult: React.FC = () => {
           </button>
         </div>
 
-        {/* Tab 1: Section Performance Breakdown */}
+        {/* Tab 1: All Attempts Marks Table + Section Breakdown */}
         {activeTab === 'analysis' && (
-          <div className="academic-card p-6 sm:p-7 mb-12">
-            <h3 className="font-heading font-bold text-base text-slate-900 mb-4">
-              Section-Wise Accuracy & Marks Distribution
-            </h3>
+          <div className="space-y-6 mb-12">
+            {/* All Attempts Performance Comparison Table */}
+            <div className="academic-card p-6 sm:p-7">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-lg bg-amber-50 text-accent-gold">
+                    <History className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-heading font-bold text-base text-slate-900">
+                      All Examination Attempts & Marks Record
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Detailed mark sheet of all {allAttempts.length} attempt(s) taken by you for this examination
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                      <th className="py-3 px-4">Attempt</th>
+                      <th className="py-3 px-4">Score</th>
+                      <th className="py-3 px-4">Correct / Incorrect</th>
+                      <th className="py-3 px-4 text-center">Accuracy</th>
+                      <th className="py-3 px-4 text-center">Time Taken</th>
+                      <th className="py-3 px-4">Submitted Date</th>
+                      <th className="py-3 px-4 text-right">Solutions & Review</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {allAttempts.map((att, idx) => {
+                      const isCurrent = att.id === attempt.id
+                      const isLatest = idx === allAttempts.length - 1
+                      const m = Math.floor(att.time_taken_seconds / 60)
+                      const s = att.time_taken_seconds % 60
+
+                      return (
+                        <tr
+                          key={att.id}
+                          className={`transition-colors ${
+                            isCurrent ? 'bg-amber-50/50 font-semibold' : 'hover:bg-slate-50'
+                          }`}
+                        >
+                          <td className="py-3.5 px-4 font-bold text-slate-900">
+                            <div className="flex items-center gap-2">
+                              <span>Attempt #{idx + 1}</span>
+                              {isLatest && (
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase">
+                                  Latest
+                                </span>
+                              )}
+                              {isCurrent && (
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                  Viewing
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
+                            <span className="text-sm">{att.score}</span>{' '}
+                            <span className="text-slate-400 font-normal">/{att.total_marks}</span>
+                            <span className="ml-1 text-[11px] text-slate-500 font-normal">
+                              ({((att.score / att.total_marks) * 100).toFixed(1)}%)
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span className="text-emerald-700 font-bold">+{att.correct_count}</span>
+                            {' / '}
+                            <span className="text-red-600 font-bold">-{att.incorrect_count}</span>
+                            <span className="text-slate-400 ml-1">({att.unattempted_count} unattempted)</span>
+                          </td>
+                          <td className="py-3.5 px-4 text-center">
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
+                              {att.accuracy_percentage}%
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4 text-center font-mono text-slate-600">
+                            {m}m {s}s
+                          </td>
+                          <td className="py-3.5 px-4 text-slate-500">
+                            {new Date(att.submitted_at).toLocaleDateString()} {new Date(att.submitted_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </td>
+                          <td className="py-3.5 px-4 text-right">
+                            {isCurrent ? (
+                              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+                                <CheckCircle2 className="w-3.5 h-3.5" /> Active Scorecard
+                              </span>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  grantAttemptAccess(att.id)
+                                  navigate(`/tests/result/${att.id}`)
+                                }}
+                                className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-primary text-white font-bold transition-all text-[11px] cursor-pointer inline-flex items-center gap-1 shadow-2xs"
+                              >
+                                <span>Switch Attempt</span>
+                                <ChevronRight className="w-3 h-3 text-accent-gold" />
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Section Performance Breakdown for Currently Viewed Attempt */}
+            <div className="academic-card p-6 sm:p-7">
+              <h3 className="font-heading font-bold text-base text-slate-900 mb-1">
+                Section-Wise Accuracy & Marks Distribution
+              </h3>
+              <p className="text-xs text-slate-500 mb-4">
+                Showing question breakdown for Attempt #{currentAttemptNumber} ({attempt.score}/{attempt.total_marks} marks)
+              </p>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
@@ -424,7 +614,8 @@ export const TestResult: React.FC = () => {
               </table>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
         {/* Tab 2: Detailed Solutions */}
         {activeTab === 'solutions' && (
