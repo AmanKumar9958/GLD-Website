@@ -28,7 +28,7 @@ const AppContent: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-900">
       <ScrollToTop />
-      <Navbar />
+      {!isExam && <Navbar />}
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -39,7 +39,6 @@ const AppContent: React.FC = () => {
           <Route path="/tests/:id" element={<TestInstructions />} />
           <Route path="/tests/exam/:id" element={<ExamRoom />} />
           <Route path="/tests/result/:attemptId" element={<TestResult />} />
-          <Route path="/tests/result" element={<Navigate to="/tests" replace />} />
         </Routes>
       </main>
       {!isExam && <Footer />}

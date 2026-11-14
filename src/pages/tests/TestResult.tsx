@@ -103,11 +103,6 @@ export const TestResult: React.FC = () => {
       return
     }
 
-    // 3. Mask the URL in browser address bar (strips the UUID so it cannot be copied)
-    try {
-      window.history.replaceState(null, '', '/tests/result')
-    } catch (e) {}
-
     async function load() {
       try {
         setIsLoading(true)

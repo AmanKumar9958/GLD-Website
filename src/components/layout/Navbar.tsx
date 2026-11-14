@@ -27,11 +27,6 @@ const Navbar: React.FC = () => {
 
   const { scrollY } = useScroll()
 
-  // Do not render navbar on CBT exam screen
-  if (location.pathname.startsWith('/tests/exam/')) {
-    return null
-  }
-
   useMotionValueEvent(scrollY, "change", (current) => {
     if (current > 20) {
       setScrolled(true)
