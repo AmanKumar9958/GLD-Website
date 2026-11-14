@@ -160,8 +160,6 @@ export async function submitTestAttempt(payload: {
   const attemptRecord = {
     test_id: testId,
     user_id: userId,
-    student_name: studentName,
-    student_email: studentEmail,
     score: finalScore,
     total_marks: test.total_marks,
     total_questions: questions.length,
@@ -171,6 +169,7 @@ export async function submitTestAttempt(payload: {
     accuracy_percentage: accuracy,
     time_taken_seconds: timeTakenSeconds,
     answers: evaluatedAnswers,
+    status: 'completed',
     submitted_at: new Date().toISOString(),
   }
 

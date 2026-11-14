@@ -51,8 +51,8 @@ export interface TestAttempt {
   id: string
   test_id: string
   user_id: string
-  student_name: string
-  student_email: string
+  student_name?: string
+  student_email?: string
   score: number
   total_marks: number
   total_questions: number

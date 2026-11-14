@@ -203,12 +203,16 @@ export const ExamRoom: React.FC = () => {
     }))
     if (currentIndex < questions.length - 1) {
       navigateToQuestion(currentIndex + 1)
+    } else {
+      setShowSubmitModal(true)
     }
   }
 
   const handleSaveAndNext = () => {
     if (currentIndex < questions.length - 1) {
       navigateToQuestion(currentIndex + 1)
+    } else {
+      setShowSubmitModal(true)
     }
   }
 
@@ -468,13 +472,23 @@ export const ExamRoom: React.FC = () => {
                     <span>Previous</span>
                   </button>
 
-                  <button
-                    onClick={handleSaveAndNext}
-                    className="px-5 py-2 rounded-xl bg-primary-dark hover:bg-primary text-white text-xs font-bold flex items-center gap-1 shadow-sm transition-all active:scale-98"
-                  >
-                    <span>Save & Next</span>
-                    <ChevronRight className="w-4 h-4 text-accent-gold" />
-                  </button>
+                  {currentIndex === questions.length - 1 ? (
+                    <button
+                      onClick={() => setShowSubmitModal(true)}
+                      className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md transition-all active:scale-98"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Submit Test</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleSaveAndNext}
+                      className="px-5 py-2 rounded-xl bg-primary-dark hover:bg-primary text-white text-xs font-bold flex items-center gap-1 shadow-sm transition-all active:scale-98"
+                    >
+                      <span>Save & Next</span>
+                      <ChevronRight className="w-4 h-4 text-accent-gold" />
+                    </button>
+                  )}
                 </div>
               </div>
             </>
@@ -566,6 +580,18 @@ export const ExamRoom: React.FC = () => {
                 })}
               </div>
             </div>
+
+            {/* Quick Submit from Palette */}
+            <div className="pt-3 border-t border-slate-100">
+              <button
+                onClick={() => setShowSubmitModal(true)}
+                disabled={isSubmitting}
+                className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-98"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>Submit Exam</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -613,6 +639,20 @@ export const ExamRoom: React.FC = () => {
                   </button>
                 )
               })}
+            </div>
+
+            <div className="pt-3 border-t border-slate-100">
+              <button
+                onClick={() => {
+                  setMobilePaletteOpen(false)
+                  setShowSubmitModal(true)
+                }}
+                disabled={isSubmitting}
+                className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold flex items-center justify-center gap-2 shadow-md active:scale-98"
+              >
+                <Send className="w-4 h-4" />
+                <span>Submit Exam</span>
+              </button>
             </div>
           </div>
         </div>
