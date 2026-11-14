@@ -13,7 +13,7 @@ import {
   User as UserIcon,
   LayoutGrid
 } from 'lucide-react'
-import { fetchTestWithQuestions, submitTestAttempt } from '../../services/testService'
+import { fetchTestWithQuestions, submitTestAttempt, grantAttemptAccess } from '../../services/testService'
 import { MockTest, TestQuestion, StudentAnswerItem, QuestionStatus } from '../../types/test'
 import { useAuth } from '../../context/AuthContext'
 
@@ -258,6 +258,7 @@ export const ExamRoom: React.FC = () => {
         timeTakenSeconds: Math.max(1, totalTimeSeconds),
       })
 
+      grantAttemptAccess(result.attemptId)
       navigate(`/tests/result/${result.attemptId}`, { replace: true })
     } catch (err: any) {
       alert('Failed to submit exam: ' + err.message)

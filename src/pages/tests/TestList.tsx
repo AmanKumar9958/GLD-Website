@@ -16,7 +16,7 @@ import {
   FileCheck2,
   ShieldCheck
 } from 'lucide-react'
-import { fetchPublishedTests, fetchStudentAttempts } from '../../services/testService'
+import { fetchPublishedTests, fetchStudentAttempts, grantAttemptAccess } from '../../services/testService'
 import { MockTest, TestAttempt } from '../../types/test'
 import { useAuth } from '../../context/AuthContext'
 
@@ -270,12 +270,15 @@ export const TestList: React.FC = () => {
                           <span>Last Score:</span>
                           <span className="font-bold">{previousAttempt.score}/{test.total_marks}</span>
                         </div>
-                        <Link
-                          to={`/tests/result/${previousAttempt.id}`}
-                          className="text-[11px] font-bold text-emerald-700 hover:underline flex items-center"
+                        <button
+                          onClick={() => {
+                            grantAttemptAccess(previousAttempt.id)
+                            navigate(`/tests/result/${previousAttempt.id}`)
+                          }}
+                          className="text-[11px] font-bold text-emerald-700 hover:underline flex items-center cursor-pointer"
                         >
                           Review <ChevronRight className="w-3 h-3" />
-                        </Link>
+                        </button>
                       </div>
                     )}
                   </div>
@@ -362,12 +365,15 @@ export const TestList: React.FC = () => {
                         </td>
                         <td className="py-3.5 px-4 text-right">
                           {isAvailable ? (
-                            <Link
-                              to={`/tests/result/${att.id}`}
-                              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white font-semibold transition-colors text-[11px]"
+                            <button
+                              onClick={() => {
+                                grantAttemptAccess(att.id)
+                                navigate(`/tests/result/${att.id}`)
+                              }}
+                              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white font-semibold transition-colors text-[11px] cursor-pointer"
                             >
                               View Analysis
-                            </Link>
+                            </button>
                           ) : (
                             <span className="px-2.5 py-1 rounded-md bg-slate-100 text-slate-400 text-[11px] font-medium select-none">
                               Expired

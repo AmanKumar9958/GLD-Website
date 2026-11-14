@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import Navbar from './components/layout/Navbar'
 import Home from './pages/Home'
 import About from './pages/About'
@@ -39,6 +39,7 @@ const AppContent: React.FC = () => {
           <Route path="/tests/:id" element={<TestInstructions />} />
           <Route path="/tests/exam/:id" element={<ExamRoom />} />
           <Route path="/tests/result/:attemptId" element={<TestResult />} />
+          <Route path="/tests/result" element={<Navigate to="/tests" replace />} />
         </Routes>
       </main>
       {!isExam && <Footer />}

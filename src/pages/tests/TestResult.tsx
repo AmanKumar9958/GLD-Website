@@ -13,30 +13,112 @@ import {
   Check,
   X,
   Lightbulb,
-  Sparkles
+  Sparkles,
+  ShieldAlert
 } from 'lucide-react'
-import { fetchAttemptDetails } from '../../services/testService'
+import { fetchAttemptDetails, isAttemptAccessGranted } from '../../services/testService'
 import { MockTest, TestQuestion, TestAttempt } from '../../types/test'
+import { useAuth } from '../../context/AuthContext'
 
 export const TestResult: React.FC = () => {
   const { attemptId } = useParams<{ attemptId: string }>()
   const navigate = useNavigate()
+  const { user, loading: authLoading } = useAuth()
 
   const [attempt, setAttempt] = useState<TestAttempt | null>(null)
   const [test, setTest] = useState<MockTest | null>(null)
   const [questions, setQuestions] = useState<TestQuestion[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [accessDeniedReason, setAccessDeniedReason] = useState<string | null>(null)
 
   const [activeTab, setActiveTab] = useState<'analysis' | 'solutions'>('analysis')
   const [solutionFilter, setSolutionFilter] = useState<'all' | 'correct' | 'incorrect' | 'unattempted'>('all')
   const [solutionSectionFilter, setSolutionSectionFilter] = useState('All')
 
+  // Anti-Copy and Content Protection
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent Ctrl+C / Cmd+C (Copy)
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+        e.preventDefault()
+      }
+      // Prevent Ctrl+U / Cmd+U (View source)
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'u') {
+        e.preventDefault()
+      }
+      // Prevent Ctrl+P / Cmd+P (Print to PDF)
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+        e.preventDefault()
+      }
+      // Prevent Ctrl+S / Cmd+S (Save webpage)
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault()
+      }
+      // Prevent F12 / DevTools
+      if (e.key === 'F12' || ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'i')) {
+        e.preventDefault()
+      }
+    }
+
+    const preventContext = (e: MouseEvent) => {
+      e.preventDefault()
+    }
+
+    const preventCopy = (e: ClipboardEvent) => {
+      e.preventDefault()
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('contextmenu', preventContext)
+    window.addEventListener('copy', preventCopy)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('contextmenu', preventContext)
+      window.removeEventListener('copy', preventCopy)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!attemptId) {
+      navigate('/tests', { replace: true })
+      return
+    }
+
+    // 1. Block opening via copied URL in a new window / tab / incognito
+    if (!isAttemptAccessGranted(attemptId)) {
+      setAccessDeniedReason(
+        'Direct URL access is blocked to protect test integrity and prevent question sharing. Opening test solutions by copying the URL into another window or tab is restricted. Please view your results directly from your "My Attempts" section.'
+      )
+      setIsLoading(false)
+      return
+    }
+
+    // 2. Wait for auth initialization
+    if (authLoading) return
+
+    if (!user) {
+      setAccessDeniedReason('Authentication Required. Please sign in to your account to view this examination attempt.')
+      setIsLoading(false)
+      return
+    }
+
+    // 3. Mask the URL in browser address bar (strips the UUID so it cannot be copied)
+    try {
+      window.history.replaceState(null, '', '/tests/result')
+    } catch (e) {}
+
     async function load() {
-      if (!attemptId) return
       try {
         setIsLoading(true)
-        const data = await fetchAttemptDetails(attemptId)
+        const data = await fetchAttemptDetails(attemptId!)
+
+        // 4. Verify that this attempt belongs to the logged-in student
+        if (!user || data.attempt.user_id !== user.id) {
+          setAccessDeniedReason('Access Denied. You do not have permission to view another student\'s examination attempt.')
+          return
+        }
+
         setAttempt(data.attempt)
         setTest(data.test)
         setQuestions(data.questions)
@@ -52,12 +134,13 @@ export const TestResult: React.FC = () => {
         }
       } catch (err) {
         console.error('Failed to load attempt details:', err)
+        setAccessDeniedReason('Unable to load attempt details. You may not be authorized to view this record.')
       } finally {
         setIsLoading(false)
       }
     }
     load()
-  }, [attemptId])
+  }, [attemptId, user, authLoading, navigate])
 
   // Unique sections
   const sections = useMemo(() => {
@@ -124,6 +207,28 @@ export const TestResult: React.FC = () => {
     return `${m}m ${s}s`
   }
 
+  if (accessDeniedReason) {
+    return (
+      <div className="pt-28 pb-20 min-h-screen bg-paper-light flex items-center justify-center p-4">
+        <div className="academic-card max-w-md w-full p-8 text-center space-y-5 shadow-xl border border-slate-200">
+          <div className="w-16 h-16 rounded-3xl bg-red-50 text-red-600 flex items-center justify-center mx-auto border border-red-200">
+            <ShieldAlert className="w-8 h-8" />
+          </div>
+          <div>
+            <h2 className="font-heading font-black text-xl text-slate-900">Access Restricted</h2>
+            <p className="text-xs text-slate-600 mt-2.5 leading-relaxed">{accessDeniedReason}</p>
+          </div>
+          <button
+            onClick={() => navigate('/tests')}
+            className="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-md active:scale-98 cursor-pointer"
+          >
+            Go to Tests & My Attempts
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   if (isLoading || !attempt || !test) {
     return (
       <div className="pt-28 pb-20 min-h-screen bg-paper-light flex items-center justify-center">
@@ -139,7 +244,7 @@ export const TestResult: React.FC = () => {
   const scorePct = ((attempt.score / attempt.total_marks) * 100).toFixed(1)
 
   return (
-    <div className="min-h-screen bg-paper-light text-slate-900 pt-20 sm:pt-24 pb-20">
+    <div className="min-h-screen bg-paper-light text-slate-900 pt-20 sm:pt-24 pb-20 select-none">
       {/* Top Banner Header */}
       <section className="py-8 bg-white border-b border-slate-200/80">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">

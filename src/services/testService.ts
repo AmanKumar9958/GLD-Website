@@ -220,3 +220,22 @@ export async function fetchStudentAttempts(userId: string): Promise<TestAttempt[
   if (error) throw error
   return data || []
 }
+
+/**
+ * One-time in-session grant for viewing test solutions
+ * Prevents copied URLs from opening in other windows, tabs or unauthorized browsers
+ */
+export function grantAttemptAccess(attemptId: string) {
+  try {
+    sessionStorage.setItem('allow_result_view_' + attemptId, 'granted_' + Date.now())
+  } catch (e) {}
+}
+
+export function isAttemptAccessGranted(attemptId: string): boolean {
+  try {
+    return !!sessionStorage.getItem('allow_result_view_' + attemptId)
+  } catch (e) {
+    return false
+  }
+}
+
