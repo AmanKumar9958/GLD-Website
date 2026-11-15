@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, User as UserIcon, LogOut, LogIn, ChevronDown } from 'lucide-react'
+import { useAuth } from '../../context/AuthContext'
 
 const Navbar: React.FC = () => {
   const location = useLocation()
+  const { user, profile, logout, openAuthModal } = useAuth()
+
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('down')
-  
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false)
+
   const { scrollY } = useScroll()
+
+  // Do not render navbar on CBT exam screen
+  if (location.pathname.startsWith('/tests/exam/')) {
+    return null
+  }
 
   useMotionValueEvent(scrollY, "change", (current) => {
     if (current > 50) {
@@ -39,11 +48,36 @@ const Navbar: React.FC = () => {
     { path: '/', label: 'Home' },
     { path: '/about', label: 'About' },
     { path: '/courses', label: 'Courses' },
-    { path: '/contact', label: 'Contact' }
+    { path: '/tests', label: 'Mock Tests' },
+    { path: '/contact', label: 'Contact' },
   ]
+
+  // Determine whether page has a dark hero at top
+  const isDarkHeroPage =
+    location.pathname === '/' ||
+    location.pathname === '/about' ||
+    location.pathname === '/courses' ||
+    location.pathname === '/contact' ||
+    location.pathname === '/tests' ||
+    location.pathname.startsWith('/tests/')
+
+  const isSolid = scrolled || !isDarkHeroPage
 
   // Determine width based on scroll direction and position
   const isSmallWidth = scrolled && scrollDirection === 'up'
+
+  const studentName =
+    profile?.name ||
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.email?.split('@')[0] ||
+    'Student'
+  const studentPhoto =
+    profile?.photo_url ||
+    user?.user_metadata?.avatar_url ||
+    user?.user_metadata?.picture ||
+    null
+  const studentInitial = studentName.charAt(0).toUpperCase()
 
   return (
     <>
@@ -58,8 +92,8 @@ const Navbar: React.FC = () => {
         <div 
           className={`transition-all duration-500 flex justify-between items-center px-6 py-3 ${
             isSmallWidth 
-              ? 'w-[90%] md:w-[70%] max-w-4xl bg-white shadow-xl rounded-full border border-gray-100' 
-              : `w-full max-w-7xl mx-auto ${scrolled ? 'bg-white shadow-md rounded-2xl' : 'bg-transparent'}`
+              ? 'w-[92%] md:w-[75%] max-w-5xl bg-white shadow-xl rounded-full border border-gray-100' 
+              : `w-full max-w-7xl mx-auto ${isSolid ? 'bg-white shadow-md rounded-2xl' : 'bg-transparent'}`
           }`}
         >
           <Link to="/" className="flex items-center space-x-3 group">
@@ -67,7 +101,7 @@ const Navbar: React.FC = () => {
               <img src="/icon.png" alt="GLD Logo" className='w-10 h-10 md:w-12 md:h-12 object-cover' />
             </div>
             <span className={`font-heading font-bold text-xl tracking-wide hidden sm:block ${
-              scrolled ? 'text-primary-dark' : 'text-white'
+              isSolid ? 'text-primary-dark' : 'text-white'
             }`}>
               GLD SHIKSHALAYA
             </span>
@@ -83,8 +117,8 @@ const Navbar: React.FC = () => {
                   to={path}
                   className={`relative px-4 py-2 rounded-full font-medium text-sm transition-colors duration-300 ${
                     isActive 
-                      ? scrolled ? 'text-primary' : 'text-white'
-                      : scrolled ? 'text-gray-600 hover:text-primary' : 'text-white/80 hover:text-white'
+                      ? isSolid ? 'text-primary font-bold' : 'text-white font-bold'
+                      : isSolid ? 'text-gray-600 hover:text-primary' : 'text-white/80 hover:text-white'
                   }`}
                 >
                   {label}
@@ -92,7 +126,7 @@ const Navbar: React.FC = () => {
                     <motion.div
                       layoutId="navbar-indicator"
                       className={`absolute inset-0 rounded-full -z-10 ${
-                        scrolled ? 'bg-primary/10' : 'bg-white/20 backdrop-blur-sm'
+                        isSolid ? 'bg-primary/10' : 'bg-white/20 backdrop-blur-sm'
                       }`}
                       transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                     />
@@ -102,11 +136,81 @@ const Navbar: React.FC = () => {
             })}
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
-            <Link to="/contact" className={`px-5 py-2.5 rounded-full font-semibold text-sm transition-transform duration-300 hover:scale-105 shadow-md ${
-              scrolled ? 'bg-primary text-white hover:shadow-primary/30' : 'bg-white text-primary hover:shadow-white/20'
-            }`}>
+          {/* User Auth or Sign In Button (Desktop) */}
+          <div className="hidden md:flex items-center gap-3">
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all text-xs font-semibold ${
+                    isSolid
+                      ? 'bg-gray-50 border-gray-200 text-gray-800 hover:bg-gray-100'
+                      : 'bg-white/10 border-white/20 text-white hover:bg-white/20'
+                  }`}
+                >
+                  {studentPhoto ? (
+                    <img
+                      src={studentPhoto}
+                      alt={studentName}
+                      className="w-7 h-7 rounded-full object-cover border border-white/30"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
+                      {studentInitial}
+                    </div>
+                  )}
+                  <span className="max-w-[100px] truncate">{studentName}</span>
+                  <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+                </button>
+
+                {/* Dropdown Menu */}
+                {userDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-50 text-xs">
+                    <div className="px-3.5 py-2 border-b border-gray-100">
+                      <p className="font-bold text-gray-900 truncate">{studentName}</p>
+                      <p className="text-[11px] text-gray-400 truncate">{user.email}</p>
+                    </div>
+
+                    <Link
+                      to="/tests"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="block px-3.5 py-2 text-gray-700 hover:bg-gray-50 font-medium"
+                    >
+                      My Tests & Submissions
+                    </Link>
+
+                    <button
+                      onClick={() => {
+                        setUserDropdownOpen(false)
+                        logout()
+                      }}
+                      className="w-full text-left px-3.5 py-2 text-red-600 hover:bg-red-50 font-medium flex items-center gap-1.5"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => openAuthModal()}
+                className={`px-4 py-2 rounded-full font-semibold text-xs transition-all duration-300 flex items-center gap-1.5 shadow ${
+                  isSolid
+                    ? 'bg-primary text-white hover:bg-primary-light'
+                    : 'bg-white text-primary hover:bg-white/90'
+                }`}
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Sign In</span>
+              </button>
+            )}
+
+            <Link
+              to="/contact"
+              className="px-4 py-2 rounded-full font-semibold text-xs transition-transform duration-300 hover:scale-105 shadow-md bg-red-DEFAULT text-white hover:shadow-red-DEFAULT/40"
+            >
               Enroll Now
             </Link>
           </div>
@@ -114,7 +218,7 @@ const Navbar: React.FC = () => {
           {/* Hamburger button (mobile only) */}
           <button
             className={`md:hidden p-2 rounded-full focus:outline-none transition-colors ${
-              scrolled ? 'text-primary hover:bg-primary/10' : 'text-white hover:bg-white/20'
+              isSolid ? 'text-primary hover:bg-primary/10' : 'text-white hover:bg-white/20'
             }`}
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
@@ -153,7 +257,41 @@ const Navbar: React.FC = () => {
                 </button>
               </div>
 
-              <div className="flex flex-col px-6 py-8 space-y-6 flex-grow">
+              {/* Student status in mobile drawer */}
+              {user && (
+                <div className="px-6 py-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    {studentPhoto ? (
+                      <img
+                        src={studentPhoto}
+                        alt={studentName}
+                        className="w-9 h-9 rounded-full object-cover border border-gray-200"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
+                        {studentInitial}
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-gray-900 truncate">{studentName}</p>
+                      <p className="text-[10px] text-gray-400 truncate">{user.email}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      logout()
+                      setMenuOpen(false)
+                    }}
+                    className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg text-xs"
+                    title="Sign Out"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              <div className="flex flex-col px-6 py-6 space-y-5 flex-grow">
                 {navItems.map(({ path, label }) => {
                   const isActive = location.pathname === path
                   return (
@@ -161,8 +299,8 @@ const Navbar: React.FC = () => {
                       key={path}
                       to={path}
                       onClick={() => setMenuOpen(false)}
-                      className={`text-2xl font-heading font-semibold transition-colors ${
-                        isActive ? 'text-primary' : 'text-gray-400 hover:text-primary-light'
+                      className={`text-xl font-heading font-semibold transition-colors ${
+                        isActive ? 'text-primary' : 'text-gray-500 hover:text-primary-light'
                       }`}
                     >
                       {label}
@@ -171,11 +309,22 @@ const Navbar: React.FC = () => {
                 })}
               </div>
 
-              <div className="p-6 border-t border-gray-100">
+              <div className="p-6 border-t border-gray-100 space-y-2">
+                {!user && (
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false)
+                      openAuthModal()
+                    }}
+                    className="block w-full text-center py-3 rounded-full border-2 border-primary text-primary font-semibold text-sm hover:bg-primary/5 transition-colors"
+                  >
+                    Sign In with Google
+                  </button>
+                )}
                 <Link
                   to="/contact"
                   onClick={() => setMenuOpen(false)}
-                  className="block w-full text-center py-4 rounded-full bg-primary text-white font-semibold shadow-lg shadow-primary/30 active:scale-95 transition-transform"
+                  className="block w-full text-center py-3.5 rounded-full bg-primary text-white font-semibold text-sm shadow-lg shadow-primary/30 active:scale-95 transition-transform"
                 >
                   Enroll Now
                 </Link>
@@ -188,4 +337,4 @@ const Navbar: React.FC = () => {
   )
 }
 
-export default Navbar
+export default Navbar
